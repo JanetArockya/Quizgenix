@@ -1,16 +1,17 @@
 import os
-import openai
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+from openai import OpenAI
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize OpenAI client with API key
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 @app.route('/')
 def home():
@@ -37,7 +38,7 @@ def generate_quiz():
         }}
         """
 
-        response = openai.chat.completions.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant designed to generate quiz questions in JSON format."},
