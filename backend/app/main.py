@@ -2,25 +2,143 @@ import os
 import json
 import requests
 import random
+import jwt
+import hashlib
+from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+from functools import wraps
 
 load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 
+# Secret key for JWT tokens
+JWT_SECRET = os.getenv('JWT_SECRET', 'your-secret-key-here')
+
+# Simple in-memory storage (in production, use a proper database)
+users = {}
+quizzes = {}
+grades = {}
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'error': 'Token is missing'}), 401
+        try:
+            if token.startswith('Bearer '):
+                token = token[7:]
+            data = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+            current_user = users.get(data['user_id'])
+            if not current_user:
+                return jsonify({'error': 'Invalid token'}), 401
+        except:
+            return jsonify({'error': 'Token is invalid'}), 401
+        return f(current_user, *args, **kwargs)
+    return decorated
+
 @app.route('/')
 def home():
     return "Quizgenix backend running"
 
+@app.route('/api/register', methods=['POST'])
+def register():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        name = data.get('name')
+        role = data.get('role', 'student')
+        
+        if not email or not password or not name:
+            return jsonify({"error": "Missing required fields"}), 400
+        
+        if email in users:
+            return jsonify({"error": "User already exists"}), 400
+        
+        # Hash password (simple hash for demo - use bcrypt in production)
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        
+        user_id = len(users) + 1
+        user = {
+            'id': user_id,
+            'email': email,
+            'name': name,
+            'role': role,
+            'password_hash': password_hash,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        users[email] = user
+        
+        # Generate JWT token
+        token = jwt.encode({
+            'user_id': email,
+            'exp': datetime.utcnow() + timedelta(days=7)
+        }, JWT_SECRET, algorithm='HS256')
+        
+        # Return user data without password
+        user_data = {k: v for k, v in user.items() if k != 'password_hash'}
+        
+        return jsonify({
+            "message": "User registered successfully",
+            "user": user_data,
+            "token": token
+        }), 201
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not email or not password:
+            return jsonify({"error": "Missing email or password"}), 400
+        
+        user = users.get(email)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        # Verify password
+        password_hash = hashlib.sha256(password.encode()).hexdigest()
+        if user['password_hash'] != password_hash:
+            return jsonify({"error": "Invalid password"}), 401
+        
+        # Generate JWT token
+        token = jwt.encode({
+            'user_id': email,
+            'exp': datetime.utcnow() + timedelta(days=7)
+        }, JWT_SECRET, algorithm='HS256')
+        
+        # Return user data without password
+        user_data = {k: v for k, v in user.items() if k != 'password_hash'}
+        
+        return jsonify({
+            "message": "Login successful",
+            "user": user_data,
+            "token": token
+        }), 200
+        
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/score', methods=['POST'])
-def calculate_score():
+@token_required
+def calculate_score(current_user):
     try:
         data = request.get_json()
         questions = data.get('questions', [])
         user_answers = data.get('user_answers', [])
+        topic = data.get('topic', 'Unknown')
+        user_id = data.get('user_id', current_user['id'])
         
         if not questions or not user_answers:
             return jsonify({"error": "Missing questions or answers"}), 400
@@ -60,6 +178,22 @@ def calculate_score():
             performance = "Not Bad! 📚"
         else:
             performance = "Keep Learning! 💪"
+        
+        # Store grade for lecturer access
+        grade_id = len(grades) + 1
+        grade_record = {
+            'id': grade_id,
+            'user_id': current_user['id'],
+            'user_name': current_user['name'],
+            'user_email': current_user['email'],
+            'topic': topic,
+            'score': correct_answers,
+            'total': total_questions,
+            'percentage': round(score_percentage, 1),
+            'completed_at': datetime.now().isoformat(),
+            'results': detailed_results
+        }
+        grades[grade_id] = grade_record
             
         return jsonify({
             "score": {
@@ -77,7 +211,8 @@ def calculate_score():
         return jsonify({"error": "Failed to calculate score"}), 500
 
 @app.route('/api/quiz', methods=['POST'])
-def generate_quiz():
+@token_required
+def generate_quiz(current_user):
     try:
         data = request.get_json()
         topic = data.get('topic', 'General Knowledge')
@@ -425,6 +560,98 @@ def parse_ai_response_to_question(ai_response, topic):
         pass
     
     return None
+
+# Lecturer-specific endpoints
+@app.route('/api/lecturer/quizzes', methods=['GET'])
+@token_required
+def get_lecturer_quizzes(current_user):
+    if current_user['role'] != 'lecturer':
+        return jsonify({'error': 'Access denied'}), 403
+    
+    # Return quizzes created by this lecturer
+    lecturer_quizzes = [q for q in quizzes.values() if q.get('created_by') == current_user['id']]
+    return jsonify({'quizzes': lecturer_quizzes})
+
+@app.route('/api/lecturer/students', methods=['GET'])
+@token_required
+def get_students(current_user):
+    if current_user['role'] != 'lecturer':
+        return jsonify({'error': 'Access denied'}), 403
+    
+    # Return all students
+    students = [u for u in users.values() if u['role'] == 'student']
+    # Remove password hashes from response
+    safe_students = [{k: v for k, v in student.items() if k != 'password_hash'} for student in students]
+    return jsonify({'students': safe_students})
+
+@app.route('/api/lecturer/grades', methods=['GET'])
+@token_required
+def get_grades(current_user):
+    if current_user['role'] != 'lecturer':
+        return jsonify({'error': 'Access denied'}), 403
+    
+    # Return all grades
+    all_grades = list(grades.values())
+    return jsonify({'grades': all_grades})
+
+@app.route('/api/lecturer/grades/download', methods=['GET'])
+@token_required
+def download_grades(current_user):
+    if current_user['role'] != 'lecturer':
+        return jsonify({'error': 'Access denied'}), 403
+    
+    format_type = request.args.get('format', 'excel')
+    
+    # Generate CSV content
+    import io
+    from flask import make_response
+    
+    output = io.StringIO()
+    output.write('Student Name,Email,Topic,Score,Total,Percentage,Date\n')
+    
+    for grade in grades.values():
+        output.write(f"{grade['user_name']},{grade['user_email']},{grade['topic']},{grade['score']},{grade['total']},{grade['percentage']}%,{grade['completed_at']}\n")
+    
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv'
+    response.headers['Content-Disposition'] = f'attachment; filename=grades.csv'
+    
+    return response
+
+@app.route('/api/quiz/<int:quiz_id>/download', methods=['GET'])
+@token_required
+def download_quiz(current_user, quiz_id):
+    if current_user['role'] != 'lecturer':
+        return jsonify({'error': 'Access denied'}), 403
+    
+    format_type = request.args.get('format', 'pdf')
+    
+    # For demo purposes, return a simple text response
+    # In production, you would generate actual PDF/Word documents
+    from flask import make_response
+    
+    quiz_content = f"Quiz {quiz_id}\n\nSample quiz content would be generated here.\n\nThis is a placeholder for {format_type} generation."
+    
+    response = make_response(quiz_content)
+    if format_type == 'pdf':
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = f'attachment; filename=quiz_{quiz_id}.pdf'
+    elif format_type == 'docx':
+        response.headers['Content-Type'] = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        response.headers['Content-Disposition'] = f'attachment; filename=quiz_{quiz_id}.docx'
+    
+    return response
+
+# Student-specific endpoints
+@app.route('/api/student/quizzes', methods=['GET'])
+@token_required
+def get_student_quizzes(current_user):
+    if current_user['role'] != 'student':
+        return jsonify({'error': 'Access denied'}), 403
+    
+    # Return available quizzes for students
+    available_quizzes = list(quizzes.values())
+    return jsonify({'quizzes': available_quizzes})
 
 
 if __name__ == '__main__':
