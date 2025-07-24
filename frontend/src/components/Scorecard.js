@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function Scorecard({ scoreData, onRestart }) {
+export default function Scorecard({ scoreData, onRestart, onBackToDashboard }) {
   const [showDetails, setShowDetails] = useState(false);
   const [showResources, setShowResources] = useState(false);
 
@@ -31,6 +31,9 @@ export default function Scorecard({ scoreData, onRestart }) {
       <div className="score-actions">
         <button className="btn btn-primary" onClick={onRestart}>
           🔄 Take Another Quiz
+        </button>
+        <button className="btn btn-primary" onClick={onBackToDashboard}>
+          🏠 Back to Dashboard
         </button>
         <button 
           className="btn btn-secondary" 
