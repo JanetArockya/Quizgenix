@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import NetworkStatus from './components/NetworkStatus';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -62,6 +63,7 @@ function App() {
 
   return (
     <div className="App">
+      <NetworkStatus />
       {currentView === 'login' && (
         <Login onLogin={handleLogin} />
       )}

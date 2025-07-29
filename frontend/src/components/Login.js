@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './Login.css';
+import apiCall from '../config/api';
 
 const Login = ({ onLogin }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -44,29 +45,33 @@ const Login = ({ onLogin }) => {
         payload.role = formData.role;
       }
 
-      console.log('Sending request to:', `http://127.0.0.1:5000${endpoint}`);
+      console.log('🔐 Attempting authentication...');
 
-      const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+      const data = await apiCall(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
-      console.log('Response:', data);
+      console.log('✅ Authentication successful:', data);
 
-      if (response.ok && data.user && data.token) {
+      if (data.user && data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         onLogin(data.user);
       } else {
-        setError(data.error || 'Authentication failed. Please try again.');
+        setError('Authentication failed. Please try again.');
       }
+
     } catch (error) {
-      console.error('Network error:', error);
-      setError('Network error. Please check your connection and try again.');
+      console.error('🚨 Authentication error:', error);
+      
+      if (error.message.includes('Cannot connect to server')) {
+        setError('🔌 Cannot connect to server. Please ensure the backend is running on http://127.0.0.1:5000');
+      } else if (error.message.includes('Network error')) {
+        setError('🌐 Network error. Please check your internet connection.');
+      } else {
+        setError(error.message || 'Authentication failed. Please try again.');
+      }
     }
 
     setLoading(false);

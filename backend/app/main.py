@@ -8,11 +8,6 @@ import io
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify, make_response
 from flask_cors import CORS
-from dotenv import load_dotenv
-from functools import wraps
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token
-import google.auth.transport.requests
 
 # Try to import optional libraries
 try:
@@ -32,7 +27,11 @@ except ImportError:
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3000"], supports_credentials=True)
+CORS(app, 
+     origins=["http://localhost:3000", "http://127.0.0.1:3000"], 
+     supports_credentials=True,
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
 
 # Secret key for JWT tokens
 JWT_SECRET = os.getenv('JWT_SECRET', 'quizgenix-super-secret-key-2024')
@@ -1033,6 +1032,41 @@ def google_auth():
     except Exception as e:
         print(f"Google auth error: {e}")
         return jsonify({'error': 'Google authentication failed'}), 500
+
+@app.route('/api/quiz/<int:quiz_id>/save', methods=['PUT'])
+@jwt_required()
+def save_quiz(quiz_id):
+    try:
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        # Find the quiz
+        quiz = Quiz.query.filter_by(id=quiz_id, creator_id=current_user_id).first()
+        if not quiz:
+            return jsonify({'error': 'Quiz not found'}), 404
+        
+        # Update quiz data
+        if 'title' in data:
+            quiz.title = data['title']
+        if 'questions' in data:
+            quiz.questions = data['questions']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Quiz updated successfully',
+            'quiz': {
+                'id': quiz.id,
+                'title': quiz.title,
+                'subject': quiz.subject,
+                'difficulty': quiz.difficulty,
+                'questions': quiz.questions
+            }
+        })
+        
+    except Exception as e:
+        print(f"Save quiz error: {str(e)}")
+        return jsonify({'error': 'Failed to save quiz'}), 500
 
 if __name__ == '__main__':
     # Initialize test users

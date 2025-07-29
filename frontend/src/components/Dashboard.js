@@ -2,728 +2,599 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
 const Dashboard = ({ user, onLogout, onStartQuiz }) => {
-  const [activeTab, setActiveTab] = useState(user.role === 'lecturer' ? 'create' : 'available');
+  const [activeTab, setActiveTab] = useState('create');
   const [quizzes, setQuizzes] = useState([]);
-  const [students, setStudents] = useState([]);
-  const [grades, setGrades] = useState([]);
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [editingQuestion, setEditingQuestion] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    subject: '',
+    topic: '',
+    difficulty: 'medium',
+    questionCount: 10
+  });
 
+  // Fetch quizzes on component mount
   useEffect(() => {
     if (user.role === 'lecturer') {
       fetchQuizzes();
-      fetchStudents();
-      fetchGrades();
-    } else {
-      fetchStudentQuizzes();
     }
   }, [user.role]);
 
-  const showMessage = (msg) => {
-    setMessage(msg);
-    setTimeout(() => setMessage(''), 3000);
-  };
-
   const fetchQuizzes = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/api/lecturer/quizzes', {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://127.0.0.1:5000/api/quizzes', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setQuizzes(data.quizzes || []);
-    } catch (error) {
-      console.error('Error fetching quizzes:', error);
-      showMessage('Failed to load quizzes');
-    }
-  };
-
-  const fetchStudents = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/lecturer/students', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setStudents(data.students || []);
-    } catch (error) {
-      console.error('Error fetching students:', error);
-      showMessage('Failed to load students');
-    }
-  };
-
-  const fetchGrades = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/lecturer/grades', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setGrades(data.grades || []);
-    } catch (error) {
-      console.error('Error fetching grades:', error);
-      showMessage('Failed to load grades');
-    }
-  };
-
-  const fetchStudentQuizzes = async () => {
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/student/quizzes', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const data = await response.json();
-      setQuizzes(data.quizzes || []);
-    } catch (error) {
-      console.error('Error fetching student quizzes:', error);
-      showMessage('Failed to load available quizzes');
-    }
-  };
-
-  const downloadQuiz = async (quizId, format = 'pdf') => {
-    try {
-      showMessage(`Downloading quiz in ${format.toUpperCase()} format...`);
-      const response = await fetch(`http://127.0.0.1:5000/api/quiz/${quizId}/download?format=${format}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `quiz_${quizId}.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        showMessage(`Quiz downloaded successfully as ${format.toUpperCase()}!`);
-      } else {
-        showMessage('Download failed. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error downloading quiz:', error);
-      showMessage('Failed to download quiz. Please try again.');
-    }
-  };
-
-  const downloadGrades = async (format = 'csv') => {
-    try {
-      showMessage(`Downloading grades in ${format.toUpperCase()} format...`);
-      const response = await fetch(`http://127.0.0.1:5000/api/lecturer/grades/download?format=${format}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `grades.${format}`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        showMessage(`Grades downloaded successfully as ${format.toUpperCase()}!`);
-      } else {
-        showMessage('Download failed. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error downloading grades:', error);
-      showMessage('Failed to download grades. Please try again.');
-    }
-  };
-
-  const handleStartQuiz = (quiz) => {
-    showMessage(`Starting ${quiz.topic} quiz...`);
-    if (onStartQuiz) {
-      onStartQuiz();
-    }
-  };
-
-  const handleViewDetails = (item) => {
-    showMessage(`Viewing details for ${item.topic || item.user_name || 'item'}`);
-  };
-
-  const handleShareQuiz = (quiz) => {
-    const shareUrl = `${window.location.origin}/quiz/${quiz.id}`;
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(shareUrl);
-      showMessage('Quiz link copied to clipboard!');
-    } else {
-      showMessage(`Share this link: ${shareUrl}`);
-    }
-  };
-
-  return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1 className="dashboard-title">
-            <span className="welcome">Welcome back,</span>
-            <span className="user-name">{user.name}</span>
-          </h1>
-          <div className="header-actions">
-            <div className="user-role">
-              <span className={`role-badge ${user.role}`}>
-                {user.role === 'lecturer' ? '👨‍🏫 Lecturer' : '👨‍🎓 Student'}
-              </span>
-            </div>
-            <button className="logout-btn" onClick={onLogout}>
-              <span>🚪</span>
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {message && (
-        <div className="message-banner">
-          {message}
-        </div>
-      )}
-
-      <main className="dashboard-main">
-        {user.role === 'lecturer' ? renderLecturerDashboard() : renderStudentDashboard()}
-      </main>
-    </div>
-  );
-
-  function renderLecturerDashboard() {
-    return (
-      <div className="dashboard-content">
-        <div className="dashboard-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'create' ? 'active' : ''}`}
-            onClick={() => setActiveTab('create')}
-          >
-            <span className="tab-icon">➕</span>
-            Create Quiz
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'quizzes' ? 'active' : ''}`}
-            onClick={() => setActiveTab('quizzes')}
-          >
-            <span className="tab-icon">📚</span>
-            My Quizzes
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'students' ? 'active' : ''}`}
-            onClick={() => setActiveTab('students')}
-          >
-            <span className="tab-icon">👥</span>
-            Students
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'grades' ? 'active' : ''}`}
-            onClick={() => setActiveTab('grades')}
-          >
-            <span className="tab-icon">📊</span>
-            Grades
-          </button>
-        </div>
-
-        <div className="tab-content">
-          {activeTab === 'create' && <CreateQuizTab onQuizCreated={fetchQuizzes} showMessage={showMessage} />}
-          {activeTab === 'quizzes' && <QuizzesTab quizzes={quizzes} onDownload={downloadQuiz} onShare={handleShareQuiz} />}
-          {activeTab === 'students' && <StudentsTab students={students} />}
-          {activeTab === 'grades' && <GradesTab grades={grades} onDownload={downloadGrades} onView={handleViewDetails} />}
-        </div>
-      </div>
-    );
-  }
-
-  function renderStudentDashboard() {
-    return (
-      <div className="dashboard-content">
-        <div className="dashboard-tabs">
-          <button 
-            className={`tab-btn ${activeTab === 'available' ? 'active' : ''}`}
-            onClick={() => setActiveTab('available')}
-          >
-            <span className="tab-icon">📋</span>
-            Available Quizzes
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'take' ? 'active' : ''}`}
-            onClick={() => setActiveTab('take')}
-          >
-            <span className="tab-icon">✏️</span>
-            Take Quiz
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'completed' ? 'active' : ''}`}
-            onClick={() => setActiveTab('completed')}
-          >
-            <span className="tab-icon">✅</span>
-            Completed
-          </button>
-          <button 
-            className={`tab-btn ${activeTab === 'results' ? 'active' : ''}`}
-            onClick={() => setActiveTab('results')}
-          >
-            <span className="tab-icon">📈</span>
-            My Results
-          </button>
-        </div>
-
-        <div className="tab-content">
-          {activeTab === 'available' && <AvailableQuizzesTab quizzes={quizzes} onStartQuiz={handleStartQuiz} />}
-          {activeTab === 'take' && <TakeQuizTab onStartQuiz={onStartQuiz} />}
-          {activeTab === 'completed' && <CompletedQuizzesTab grades={grades} onView={handleViewDetails} />}
-          {activeTab === 'results' && <StudentResultsTab grades={grades} onView={handleViewDetails} onRetake={handleStartQuiz} />}
-        </div>
-      </div>
-    );
-  }
-};
-
-// Create Quiz Tab Component
-const CreateQuizTab = ({ onQuizCreated, showMessage }) => {
-  const [formData, setFormData] = useState({
-    topic: '',
-    numQuestions: 5,
-    difficulty: 'medium',
-    timeLimit: 30
-  });
-  const [loading, setLoading] = useState(false);
-
-  const handleCreateQuiz = async (e) => {
-    e.preventDefault();
-    
-    if (!formData.topic.trim()) {
-      showMessage('Please enter a topic for the quiz');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await fetch('http://127.0.0.1:5000/api/quiz', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          topic: formData.topic,
-          num_questions: formData.numQuestions,
-          difficulty: formData.difficulty,
-          time_limit: formData.timeLimit
-        })
       });
 
       if (response.ok) {
         const data = await response.json();
-        showMessage(`✅ Quiz "${formData.topic}" created successfully with ${data.questions.length} questions!`);
-        setFormData({ topic: '', numQuestions: 5, difficulty: 'medium', timeLimit: 30 });
-        if (onQuizCreated) onQuizCreated();
-      } else {
-        const error = await response.json();
-        showMessage(`❌ Failed to create quiz: ${error.error || 'Unknown error'}`);
+        setQuizzes(data.quizzes || []);
       }
     } catch (error) {
-      console.error('Error creating quiz:', error);
-      showMessage('❌ Failed to create quiz. Please check your connection and try again.');
+      console.error('Error fetching quizzes:', error);
     }
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    if (error) setError('');
+  };
+
+  const handleCreateQuiz = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://127.0.0.1:5000/api/quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setCurrentQuiz(data);
+        setShowPreview(true);
+        setFormData({
+          title: '',
+          subject: '',
+          topic: '',
+          difficulty: 'medium',
+          questionCount: 10
+        });
+      } else {
+        setError(data.error || 'Failed to create quiz');
+      }
+    } catch (error) {
+      setError('Network error. Please try again.');
+    }
+
     setLoading(false);
   };
 
-  return (
-    <div className="create-quiz-section">
-      <h2>Create New Quiz</h2>
-      <form onSubmit={handleCreateQuiz} className="create-quiz-form">
-        <div className="form-grid">
-          <div className="form-group">
-            <label>Topic</label>
-            <input
-              type="text"
-              value={formData.topic}
-              onChange={(e) => setFormData({...formData, topic: e.target.value})}
-              placeholder="Enter quiz topic (e.g., JavaScript, Math, History)"
-              required
-            />
+  const handleSaveQuiz = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`http://127.0.0.1:5000/api/quiz/${currentQuiz.id}/save`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(currentQuiz),
+      });
+
+      if (response.ok) {
+        setShowPreview(false);
+        setCurrentQuiz(null);
+        fetchQuizzes();
+        alert('Quiz saved successfully!');
+      } else {
+        const data = await response.json();
+        setError(data.error || 'Failed to save quiz');
+      }
+    } catch (error) {
+      setError('Failed to save quiz. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditQuestion = (questionIndex) => {
+    setEditingQuestion({
+      index: questionIndex,
+      ...currentQuiz.questions[questionIndex]
+    });
+  };
+
+  const handleUpdateQuestion = () => {
+    const updatedQuestions = [...currentQuiz.questions];
+    updatedQuestions[editingQuestion.index] = {
+      question: editingQuestion.question,
+      options: editingQuestion.options,
+      correct_answer: editingQuestion.correct_answer
+    };
+    
+    setCurrentQuiz({
+      ...currentQuiz,
+      questions: updatedQuestions
+    });
+    
+    setEditingQuestion(null);
+  };
+
+  const handleDeleteQuestion = (questionIndex) => {
+    if (window.confirm('Are you sure you want to delete this question?')) {
+      const updatedQuestions = currentQuiz.questions.filter((_, index) => index !== questionIndex);
+      setCurrentQuiz({
+        ...currentQuiz,
+        questions: updatedQuestions
+      });
+    }
+  };
+
+  const handleDownload = async (quizId, fileType) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`http://127.0.0.1:5000/api/quiz/${quizId}/download/${fileType}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const contentDisposition = response.headers.get('content-disposition');
+        let filename = `quiz_${quizId}.${fileType === 'word' ? 'docx' : fileType === 'excel' ? 'xlsx' : 'pdf'}`;
+        
+        if (contentDisposition) {
+          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+          if (filenameMatch) {
+            filename = filenameMatch[1];
+          }
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        setError('');
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || 'Download failed');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      setError('Failed to download file. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Quiz Preview Modal Component
+  const QuizPreview = () => {
+    if (!showPreview || !currentQuiz) return null;
+
+    return (
+      <div className="quiz-preview-overlay">
+        <div className="quiz-preview-modal">
+          <div className="preview-header">
+            <h2>📋 Quiz Preview: {currentQuiz.title}</h2>
+            <div className="preview-actions">
+              <button onClick={handleSaveQuiz} className="save-btn" disabled={loading}>
+                💾 Save Quiz
+              </button>
+              <button onClick={() => setShowPreview(false)} className="close-btn">
+                ✖️ Close
+              </button>
+            </div>
           </div>
-          <div className="form-group">
-            <label>Number of Questions</label>
-            <select
-              value={formData.numQuestions}
-              onChange={(e) => setFormData({...formData, numQuestions: parseInt(e.target.value)})}
-            >
-              {[5, 10, 15, 20].map(num => (
-                <option key={num} value={num}>{num} Questions</option>
+          
+          <div className="preview-content">
+            <div className="quiz-info-bar">
+              <span>📚 Subject: {currentQuiz.subject}</span>
+              <span>🎯 Difficulty: {currentQuiz.difficulty}</span>
+              <span>📊 Questions: {currentQuiz.questions?.length || 0}</span>
+            </div>
+
+            <div className="questions-preview">
+              {currentQuiz.questions?.map((question, index) => (
+                <div key={index} className="question-preview-card">
+                  <div className="question-header">
+                    <h3>Question {index + 1}</h3>
+                    <div className="question-actions">
+                      <button 
+                        onClick={() => handleEditQuestion(index)}
+                        className="edit-btn"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteQuestion(index)}
+                        className="delete-btn"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <p className="question-text">{question.question}</p>
+                  
+                  <div className="options-list">
+                    {question.options?.map((option, optIndex) => (
+                      <div 
+                        key={optIndex} 
+                        className={`option-item ${option === question.correct_answer ? 'correct' : ''}`}
+                      >
+                        <span className="option-letter">{String.fromCharCode(65 + optIndex)}</span>
+                        <span className="option-text">{option}</span>
+                        {option === question.correct_answer && <span className="correct-badge">✅</span>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ))}
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Difficulty</label>
-            <select
-              value={formData.difficulty}
-              onChange={(e) => setFormData({...formData, difficulty: e.target.value})}
-            >
-              <option value="easy">🟢 Easy</option>
-              <option value="medium">🟡 Medium</option>
-              <option value="hard">🔴 Hard</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Time Limit (minutes)</label>
-            <input
-              type="number"
-              value={formData.timeLimit}
-              onChange={(e) => setFormData({...formData, timeLimit: parseInt(e.target.value)})}
-              min="5"
-              max="120"
-            />
+            </div>
           </div>
         </div>
-        <button type="submit" className="create-btn" disabled={loading}>
-          {loading ? (
+      </div>
+    );
+  };
+
+  // Question Edit Modal Component
+  const QuestionEditModal = () => {
+    if (!editingQuestion) return null;
+
+    return (
+      <div className="edit-modal-overlay">
+        <div className="edit-modal">
+          <div className="edit-modal-header">
+            <h3>✏️ Edit Question {editingQuestion.index + 1}</h3>
+            <button onClick={() => setEditingQuestion(null)} className="close-btn">✖️</button>
+          </div>
+          
+          <div className="edit-modal-content">
+            <div className="form-group">
+              <label>Question:</label>
+              <textarea
+                value={editingQuestion.question}
+                onChange={(e) => setEditingQuestion({
+                  ...editingQuestion,
+                  question: e.target.value
+                })}
+                className="question-textarea"
+                rows="3"
+              />
+            </div>
+
+            <div className="options-edit">
+              <label>Options:</label>
+              {editingQuestion.options?.map((option, index) => (
+                <div key={index} className="option-edit-group">
+                  <span className="option-label">{String.fromCharCode(65 + index)})</span>
+                  <input
+                    type="text"
+                    value={option}
+                    onChange={(e) => {
+                      const newOptions = [...editingQuestion.options];
+                      newOptions[index] = e.target.value;
+                      setEditingQuestion({
+                        ...editingQuestion,
+                        options: newOptions
+                      });
+                    }}
+                    className="option-input"
+                  />
+                  <input
+                    type="radio"
+                    name="correctAnswer"
+                    checked={option === editingQuestion.correct_answer}
+                    onChange={() => setEditingQuestion({
+                      ...editingQuestion,
+                      correct_answer: option
+                    })}
+                    className="correct-radio"
+                  />
+                  <label className="radio-label">Correct</label>
+                </div>
+              ))}
+            </div>
+
+            <div className="edit-actions">
+              <button onClick={handleUpdateQuestion} className="update-btn">
+                ✅ Update Question
+              </button>
+              <button onClick={() => setEditingQuestion(null)} className="cancel-btn">
+                ❌ Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="dashboard">
+      <div className="dashboard-header">
+        <div className="header-content">
+          <div className="dashboard-title">
+            <span className="welcome">Welcome back!</span>
+            <span className="user-name">{user.name}</span>
+          </div>
+          <div className="header-actions">
+            <span className="role-badge">{user.role}</span>
+            <button onClick={onLogout} className="logout-btn">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-main">
+        <div className="dashboard-content">
+          {user.role === 'lecturer' ? (
             <>
-              <div className="loading-spinner-small"></div>
-              Creating Quiz...
+              <div className="dashboard-tabs">
+                <button
+                  className={`tab-btn ${activeTab === 'create' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('create')}
+                >
+                  <span className="tab-icon">✨</span>
+                  Create Quiz
+                </button>
+                <button
+                  className={`tab-btn ${activeTab === 'manage' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('manage')}
+                >
+                  <span className="tab-icon">📚</span>
+                  My Quizzes
+                </button>
+                <button
+                  className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('analytics')}
+                >
+                  <span className="tab-icon">📊</span>
+                  Analytics
+                </button>
+              </div>
+
+              <div className="tab-content">
+                {activeTab === 'create' && (
+                  <div className="create-quiz-section">
+                    <h2>Create New Quiz</h2>
+                    
+                    {error && (
+                      <div className="error-message">
+                        {error}
+                      </div>
+                    )}
+
+                    <form onSubmit={handleCreateQuiz} className="create-quiz-form">
+                      <div className="form-grid">
+                        <div className="form-group">
+                          <label>📝 Quiz Title</label>
+                          <input
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            placeholder="Enter quiz title..."
+                            required
+                            className="form-input"
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>📚 Subject</label>
+                          <input
+                            type="text"
+                            name="subject"
+                            value={formData.subject}
+                            onChange={handleInputChange}
+                            placeholder="e.g., Mathematics, Science..."
+                            required
+                            className="form-input"
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>🎯 Topic</label>
+                          <input
+                            type="text"
+                            name="topic"
+                            value={formData.topic}
+                            onChange={handleInputChange}
+                            placeholder="Specific topic to focus on..."
+                            required
+                            className="form-input"
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>⚡ Difficulty Level</label>
+                          <select
+                            name="difficulty"
+                            value={formData.difficulty}
+                            onChange={handleInputChange}
+                            className="form-input"
+                          >
+                            <option value="easy">🟢 Easy</option>
+                            <option value="medium">🟡 Medium</option>
+                            <option value="hard">🔴 Hard</option>
+                          </select>
+                        </div>
+
+                        <div className="form-group">
+                          <label>📊 Number of Questions</label>
+                          <select
+                            name="questionCount"
+                            value={formData.questionCount}
+                            onChange={handleInputChange}
+                            className="form-input"
+                          >
+                            <option value="5">5 Questions</option>
+                            <option value="10">10 Questions</option>
+                            <option value="15">15 Questions</option>
+                            <option value="20">20 Questions</option>
+                            <option value="25">25 Questions</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        className="create-btn"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <span className="loading-spinner-small"></span>
+                            Generating Quiz...
+                          </>
+                        ) : (
+                          <>
+                            🚀 Generate Quiz Preview
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </div>
+                )}
+
+                {activeTab === 'manage' && (
+                  <div className="manage-quiz-section">
+                    <div className="section-header">
+                      <h2>My Quizzes</h2>
+                      <div className="quiz-stats">
+                        <div className="stat-card">
+                          <span className="stat-number">{quizzes.length}</span>
+                          <span className="stat-label">Total Quizzes</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {quizzes.length === 0 ? (
+                      <div className="empty-state">
+                        <p>📝 No quizzes created yet</p>
+                        <button 
+                          onClick={() => setActiveTab('create')}
+                          className="action-btn"
+                        >
+                          Create Your First Quiz
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="quizzes-grid">
+                        {quizzes.map((quiz) => (
+                          <div key={quiz.id} className="quiz-card">
+                            <div className="quiz-header">
+                              <h3>{quiz.title}</h3>
+                              <span className="quiz-date">
+                                {new Date(quiz.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            
+                            <div className="quiz-details">
+                              <span>📚 {quiz.subject}</span>
+                              <span>🎯 {quiz.difficulty}</span>
+                              <span>📊 {quiz.questions?.length || 0} Questions</span>
+                            </div>
+
+                            <div className="quiz-actions">
+                              <button 
+                                onClick={() => handleDownload(quiz.id, 'pdf')}
+                                className="download-btn pdf"
+                                disabled={loading}
+                              >
+                                📄 PDF
+                              </button>
+                              <button 
+                                onClick={() => handleDownload(quiz.id, 'word')}
+                                className="download-btn word"
+                                disabled={loading}
+                              >
+                                📝 Word
+                              </button>
+                              <button 
+                                onClick={() => handleDownload(quiz.id, 'excel')}
+                                className="download-btn excel"
+                                disabled={loading}
+                              >
+                                📊 Excel
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  setCurrentQuiz(quiz);
+                                  setShowPreview(true);
+                                }}
+                                className="edit-quiz-btn"
+                              >
+                                ✏️ Edit
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'analytics' && (
+                  <div className="analytics-section">
+                    <h2>📊 Quiz Analytics</h2>
+                    <div className="coming-soon">
+                      <p>📈 Analytics dashboard coming soon...</p>
+                      <p>Track student performance, quiz completion rates, and more!</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
-            <>
-              <span>✨</span>
-              Generate Quiz
-            </>
+            // Student Dashboard
+            <div className="student-dashboard">
+              <h2>🎓 Available Quizzes</h2>
+              <div className="coming-soon">
+                <p>📚 Student quiz interface coming soon...</p>
+                <p>Take quizzes, view scores, and track your progress!</p>
+              </div>
+            </div>
           )}
-        </button>
-      </form>
+        </div>
+      </div>
+
+      {/* Modals */}
+      <QuizPreview />
+      <QuestionEditModal />
     </div>
   );
 };
-
-// Quizzes Tab Component
-const QuizzesTab = ({ quizzes, onDownload, onShare }) => (
-  <div className="quizzes-section">
-    <div className="section-header">
-      <h2>My Quizzes</h2>
-      <div className="quiz-stats">
-        <div className="stat-card">
-          <span className="stat-number">{quizzes.length}</span>
-          <span className="stat-label">Total Quizzes</span>
-        </div>
-      </div>
-    </div>
-    <div className="quizzes-grid">
-      {quizzes.length > 0 ? quizzes.map((quiz, index) => (
-        <div key={index} className="quiz-card">
-          <div className="quiz-header">
-            <h3>{quiz.topic || `Quiz ${index + 1}`}</h3>
-            <span className="quiz-date">{new Date(quiz.created_at).toLocaleDateString()}</span>
-          </div>
-          <div className="quiz-details">
-            <span>📝 {quiz.num_questions} Questions</span>
-            <span>🎯 {quiz.difficulty}</span>
-          </div>
-          <div className="quiz-actions">
-            <button 
-              className="download-btn pdf"
-              onClick={() => onDownload(quiz.id, 'pdf')}
-            >
-              📄 PDF
-            </button>
-            <button 
-              className="download-btn word"
-              onClick={() => onDownload(quiz.id, 'docx')}
-            >
-              📘 Word
-            </button>
-            <button 
-              className="share-btn"
-              onClick={() => onShare(quiz)}
-            >
-              🔗 Share
-            </button>
-          </div>
-        </div>
-      )) : (
-        <div className="empty-state">
-          <p>No quizzes created yet. Start by creating your first quiz!</p>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-// Students Tab Component
-const StudentsTab = ({ students }) => (
-  <div className="students-section">
-    <h2>Registered Students</h2>
-    <div className="students-grid">
-      {students.length > 0 ? students.map((student, index) => (
-        <div key={index} className="student-card">
-          <div className="student-avatar">
-            {student.name ? student.name.charAt(0) : 'S'}
-          </div>
-          <div className="student-info">
-            <h3>{student.name || `Student ${index + 1}`}</h3>
-            <p>{student.email || 'student@example.com'}</p>
-            <div className="student-stats">
-              <span>📅 Joined: {new Date(student.created_at).toLocaleDateString()}</span>
-            </div>
-          </div>
-        </div>
-      )) : (
-        <div className="empty-state">
-          <p>No students registered yet.</p>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-// Grades Tab Component
-const GradesTab = ({ grades, onDownload, onView }) => (
-  <div className="grades-section">
-    <div className="section-header">
-      <h2>Student Grades</h2>
-      <div className="download-actions">
-        <button 
-          className="download-btn excel"
-          onClick={() => onDownload('excel')}
-        >
-          📊 Excel
-        </button>
-        <button 
-          className="download-btn csv"
-          onClick={() => onDownload('csv')}
-        >
-          📋 CSV
-        </button>
-      </div>
-    </div>
-    <div className="grades-table">
-      <table>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Email</th>
-            <th>Topic</th>
-            <th>Score</th>
-            <th>Percentage</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {grades.length > 0 ? (
-            grades.map((grade, index) => (
-              <tr key={index}>
-                <td>{grade.user_name || `Student ${index + 1}`}</td>
-                <td>{grade.user_email || 'student@example.com'}</td>
-                <td>{grade.topic || 'Sample Quiz'}</td>
-                <td>{grade.score || 0}/{grade.total || 10}</td>
-                <td>
-                  <span className={`score-badge ${
-                    (grade.percentage || 0) >= 90 ? 'excellent' : 
-                    (grade.percentage || 0) >= 75 ? 'good' : 'needs-improvement'
-                  }`}>
-                    {grade.percentage || 0}%
-                  </span>
-                </td>
-                <td>{grade.completed_at ? new Date(grade.completed_at).toLocaleDateString() : 'Today'}</td>
-                <td>
-                  <button 
-                    className="view-btn"
-                    onClick={() => onView(grade)}
-                  >
-                    👁️ View
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            // Show sample data when no grades available
-            [
-              { id: 1, user_name: 'John Doe', user_email: 'john@example.com', topic: 'Mathematics', score: 8, total: 10, percentage: 85, completed_at: new Date().toISOString() },
-              { id: 2, user_name: 'Jane Smith', user_email: 'jane@example.com', topic: 'Science', score: 9, total: 10, percentage: 92, completed_at: new Date().toISOString() }
-            ].map((grade, index) => (
-              <tr key={index}>
-                <td>{grade.user_name}</td>
-                <td>{grade.user_email}</td>
-                <td>{grade.topic}</td>
-                <td>{grade.score}/{grade.total}</td>
-                <td>
-                  <span className={`score-badge ${
-                    grade.percentage >= 90 ? 'excellent' : 
-                    grade.percentage >= 75 ? 'good' : 'needs-improvement'
-                  }`}>
-                    {grade.percentage}%
-                  </span>
-                </td>
-                <td>{new Date(grade.completed_at).toLocaleDateString()}</td>
-                <td>
-                  <button 
-                    className="view-btn"
-                    onClick={() => onView(grade)}
-                  >
-                    👁️ View
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
-  </div>
-);
-
-// Student components
-const AvailableQuizzesTab = ({ quizzes, onStartQuiz }) => (
-  <div className="available-quizzes">
-    <h2>Available Quizzes</h2>
-    <div className="quiz-list">
-      {quizzes.length > 0 ? (
-        quizzes.map((quiz, index) => (
-          <div key={index} className="quiz-item">
-            <h3>{quiz.topic || `Quiz ${index + 1}`}</h3>
-            <p>📝 {quiz.num_questions || 5} questions • 🎯 {quiz.difficulty || 'Medium'}</p>
-            <p>👨‍🏫 Created by: {quiz.created_by_name || 'Instructor'}</p>
-            <button 
-              className="start-quiz-btn"
-              onClick={() => onStartQuiz(quiz)}
-            >
-              🚀 Start Quiz
-            </button>
-          </div>
-        ))
-      ) : (
-        <div className="empty-state">
-          <p>No quizzes available at the moment. Check back later!</p>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-const TakeQuizTab = ({ onStartQuiz }) => (
-  <div className="take-quiz-section">
-    <h2>🎯 Take a Quiz</h2>
-    <div className="custom-quiz-card">
-      <h3>Create Custom Quiz</h3>
-      <p>Generate a personalized quiz on any topic you want to learn!</p>
-      <button 
-        className="custom-quiz-btn"
-        onClick={onStartQuiz}
-      >
-        🎨 Create Custom Quiz
-      </button>
-    </div>
-  </div>
-);
-
-const CompletedQuizzesTab = ({ grades, onView }) => (
-  <div className="completed-quizzes">
-    <h2>Completed Quizzes</h2>
-    <div className="quiz-list">
-      {grades.length > 0 ? (
-        grades.map((grade, index) => (
-          <div key={index} className="quiz-item completed">
-            <h3>{grade.topic} Quiz</h3>
-            <p>Score: {grade.score}/{grade.total} ({grade.percentage}%)</p>
-            <div className="quiz-meta">
-              <span className="completed-date">Completed: {new Date(grade.completed_at).toLocaleDateString()}</span>
-            </div>
-            <button 
-              className="view-btn"
-              onClick={() => onView(grade)}
-            >
-              📄 View Details
-            </button>
-          </div>
-        ))
-      ) : (
-        <div className="empty-state">
-          <p>No completed quizzes yet. Start taking some quizzes!</p>
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-const StudentResultsTab = ({ grades, onView, onRetake }) => (
-  <div className="student-results">
-    <h2>My Results & Statistics</h2>
-    
-    {/* Statistics Cards */}
-    <div className="stats-grid">
-      <div className="stat-card">
-        <div className="stat-icon">📊</div>
-        <div className="stat-number">{grades.length}</div>
-        <div className="stat-label">Total Quizzes</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-icon">⭐</div>
-        <div className="stat-number">
-          {grades.length > 0 ? Math.round(grades.reduce((sum, grade) => sum + grade.percentage, 0) / grades.length) : 0}%
-        </div>
-        <div className="stat-label">Average Score</div>
-      </div>
-      <div className="stat-card">
-        <div className="stat-icon">🏆</div>
-        <div className="stat-number">
-          {grades.length > 0 ? Math.max(...grades.map(g => g.percentage)) : 0}%
-        </div>
-        <div className="stat-label">Best Score</div>
-      </div>
-    </div>
-
-    {/* Results Table */}
-    <div className="results-table">
-      <h3>Subject Performance</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Subject</th>
-            <th>Best Score</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {grades.length > 0 ? grades.map((result, index) => (
-            <tr key={index}>
-              <td>{result.topic}</td>
-              <td>
-                <span className={`score-badge ${result.percentage >= 90 ? 'excellent' : result.percentage >= 75 ? 'good' : 'needs-improvement'}`}>
-                  {result.percentage}%
-                </span>
-              </td>
-              <td>{new Date(result.completed_at).toLocaleDateString()}</td>
-              <td>
-                <button 
-                  className="action-btn view"
-                  onClick={() => onView(result)}
-                >
-                  📄 View
-                </button>
-                <button 
-                  className="action-btn retake"
-                  onClick={() => onRetake(result)}
-                >
-                  🔄 Retake
-                </button>
-              </td>
-            </tr>
-          )) : (
-            <tr>
-              <td colSpan="4">No results yet. Take some quizzes to see your performance!</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  </div>
-);
 
 export default Dashboard;
