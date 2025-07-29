@@ -6,7 +6,7 @@ import jwt
 import hashlib
 import io
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, send_file
 from flask_cors import CORS
 
 # Try to import optional libraries
@@ -23,6 +23,8 @@ try:
 except ImportError:
     HAS_WIKIPEDIA = False
     print("Wikipedia not available - using basic templates")
+
+from file_service import QuizFileGenerator
 
 load_dotenv()
 
@@ -1033,14 +1035,94 @@ def google_auth():
         print(f"Google auth error: {e}")
         return jsonify({'error': 'Google authentication failed'}), 500
 
+@app.route('/api/quiz/<int:quiz_id>/download/<file_type>', methods=['GET'])
+@token_required
+def download_quiz(quiz_id, file_type):
+    try:
+        current_user_id = get_jwt_identity()
+        
+        # Get quiz from database
+        quiz = Quiz.query.filter_by(id=quiz_id, creator_id=current_user_id).first()
+        if not quiz:
+            return jsonify({'error': 'Quiz not found'}), 404
+        
+        # Prepare quiz data
+        quiz_data = {
+            'id': quiz.id,
+            'title': quiz.title,
+            'subject': quiz.subject,
+            'difficulty': quiz.difficulty,
+            'questions': quiz.questions,
+            'created_at': quiz.created_at.isoformat() if quiz.created_at else None
+        }
+        
+        # Generate file
+        file_generator = QuizFileGenerator()
+        
+        if file_type == 'word':
+            filepath, filename = file_generator.generate_word_file(quiz_data)
+            mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        elif file_type == 'pdf':
+            filepath, filename = file_generator.generate_pdf_file(quiz_data)
+            mimetype = 'application/pdf'
+        elif file_type == 'excel':
+            filepath, filename = file_generator.generate_excel_file(quiz_data)
+            if not filepath:
+                return jsonify({'error': 'Excel generation not available. Install pandas and openpyxl.'}), 500
+            mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        else:
+            return jsonify({'error': 'Invalid file type. Use: word, pdf, or excel'}), 400
+        
+        def remove_file(response):
+            try:
+                os.remove(filepath)
+            except Exception:
+                pass
+            return response
+        
+        # Send file
+        return send_file(
+            filepath,
+            as_attachment=True,
+            download_name=filename,
+            mimetype=mimetype
+        )
+        
+    except Exception as e:
+        print(f"Download error: {str(e)}")
+        return jsonify({'error': f'Failed to generate file: {str(e)}'}), 500
+
+@app.route('/api/quiz/<int:quiz_id>/share', methods=['POST'])
+@token_required
+def share_quiz(quiz_id):
+    try:
+        current_user_id = get_jwt_identity()
+        
+        quiz = Quiz.query.filter_by(id=quiz_id, creator_id=current_user_id).first()
+        if not quiz:
+            return jsonify({'error': 'Quiz not found'}), 404
+        
+        # Generate shareable link
+        share_link = f"http://localhost:3000/quiz/shared/{quiz.id}"
+        
+        return jsonify({
+            'message': 'Quiz shared successfully',
+            'share_link': share_link,
+            'quiz_title': quiz.title,
+            'quiz_id': quiz.id
+        })
+        
+    except Exception as e:
+        print(f"Share error: {str(e)}")
+        return jsonify({'error': 'Failed to share quiz'}), 500
+
 @app.route('/api/quiz/<int:quiz_id>/save', methods=['PUT'])
-@jwt_required()
+@token_required
 def save_quiz(quiz_id):
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
         
-        # Find the quiz
         quiz = Quiz.query.filter_by(id=quiz_id, creator_id=current_user_id).first()
         if not quiz:
             return jsonify({'error': 'Quiz not found'}), 404
@@ -1050,6 +1132,10 @@ def save_quiz(quiz_id):
             quiz.title = data['title']
         if 'questions' in data:
             quiz.questions = data['questions']
+        if 'subject' in data:
+            quiz.subject = data['subject']
+        if 'difficulty' in data:
+            quiz.difficulty = data['difficulty']
         
         db.session.commit()
         
@@ -1060,13 +1146,23 @@ def save_quiz(quiz_id):
                 'title': quiz.title,
                 'subject': quiz.subject,
                 'difficulty': quiz.difficulty,
-                'questions': quiz.questions
+                'questions': quiz.questions,
+                'created_at': quiz.created_at.isoformat() if quiz.created_at else None
             }
         })
         
     except Exception as e:
         print(f"Save quiz error: {str(e)}")
         return jsonify({'error': 'Failed to save quiz'}), 500
+
+# Add a test route to verify backend is working
+@app.route('/api/test', methods=['GET'])
+def test_backend():
+    return jsonify({
+        'message': 'Backend is working perfectly!',
+        'status': 'success',
+        'timestamp': datetime.now().isoformat()
+    })
 
 if __name__ == '__main__':
     # Initialize test users

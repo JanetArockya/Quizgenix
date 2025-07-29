@@ -11,12 +11,13 @@ const NetworkStatus = () => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Check backend status
     checkBackendStatus();
+    const interval = setInterval(checkBackendStatus, 30000); // Check every 30 seconds
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      clearInterval(interval);
     };
   }, []);
 
@@ -33,7 +34,6 @@ const NetworkStatus = () => {
         setBackendStatus('error');
       }
     } catch (error) {
-      console.error('Backend check failed:', error);
       setBackendStatus('disconnected');
     }
   };
@@ -49,9 +49,10 @@ const NetworkStatus = () => {
         color: 'white',
         padding: '10px',
         textAlign: 'center',
-        zIndex: 9999
+        zIndex: 9999,
+        fontSize: '14px'
       }}>
-        🔌 No internet connection
+        🔌 No internet connection - Please check your network
       </div>
     );
   }
@@ -67,14 +68,23 @@ const NetworkStatus = () => {
         color: '#333',
         padding: '10px',
         textAlign: 'center',
-        zIndex: 9999
+        zIndex: 9999,
+        fontSize: '14px'
       }}>
-        ⚠️ Backend server disconnected. Please start the backend: <code>python app/main.py</code>
+        ⚠️ Backend server disconnected. Please start: <code>python app/main.py</code>
         <button 
           onClick={checkBackendStatus}
-          style={{ marginLeft: '10px', padding: '2px 8px' }}
+          style={{ 
+            marginLeft: '10px', 
+            padding: '5px 10px',
+            border: 'none',
+            borderRadius: '4px',
+            background: '#333',
+            color: 'white',
+            cursor: 'pointer'
+          }}
         >
-          Retry
+          Retry Connection
         </button>
       </div>
     );

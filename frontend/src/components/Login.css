@@ -1,3 +1,228 @@
+import React, { useState } from 'react';
+import './Login.css';
+
+const Login = ({ onLogin }) => {
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    name: '',
+    role: 'student'
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+    if (error) setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    if (!isLoginMode && formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match!');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const endpoint = isLoginMode ? '/api/login' : '/api/register';
+      const payload = {
+        email: formData.email,
+        password: formData.password
+      };
+      
+      if (!isLoginMode) {
+        payload.name = formData.name;
+        payload.role = formData.role;
+      }
+
+      console.log('🔐 Attempting authentication...');
+
+      const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('✅ Authentication successful:', data);
+        if (data.user && data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          onLogin(data.user);
+        } else {
+          setError('Authentication failed. Please try again.');
+        }
+      } else {
+        setError(data.error || 'Authentication failed');
+      }
+    } catch (error) {
+      console.error('🚨 Authentication error:', error);
+      if (error.message.includes('fetch')) {
+        setError('🔌 Cannot connect to server. Please ensure the backend is running on http://127.0.0.1:5000');
+      } else {
+        setError('Network error. Please check your connection.');
+      }
+    }
+
+    setLoading(false);
+  };
+
+  return (
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <h1 className="login-title">🧠 Quizgenix</h1>
+          <p className="login-subtitle">AI-Powered Quiz Generation Platform</p>
+        </div>
+
+        <div className="login-tabs">
+          <button
+            className={`tab-btn ${isLoginMode ? 'active' : ''}`}
+            onClick={() => setIsLoginMode(true)}
+          >
+            Sign In
+          </button>
+          <button
+            className={`tab-btn ${!isLoginMode ? 'active' : ''}`}
+            onClick={() => setIsLoginMode(false)}
+          >
+            Sign Up
+          </button>
+        </div>
+
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="login-form">
+          {!isLoginMode && (
+            <div className="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                placeholder="Enter your full name"
+                required
+                className="form-input"
+              />
+            </div>
+          )}
+
+          <div className="form-group">
+            <label>Email Address</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="Enter your email"
+              required
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Password</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              placeholder="Enter your password"
+              required
+              className="form-input"
+            />
+          </div>
+
+          {!isLoginMode && (
+            <>
+              <div className="form-group">
+                <label>Confirm Password</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  placeholder="Confirm your password"
+                  required
+                  className="form-input"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Role</label>
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  className="form-input"
+                >
+                  <option value="student">🎓 Student</option>
+                  <option value="lecturer">👨‍🏫 Lecturer</option>
+                </select>
+              </div>
+            </>
+          )}
+
+          <button 
+            type="submit" 
+            className="login-btn"
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <span className="loading-spinner"></span>
+                {isLoginMode ? 'Signing In...' : 'Signing Up...'}
+              </>
+            ) : (
+              isLoginMode ? 'Sign In' : 'Sign Up'
+            )}
+          </button>
+        </form>
+
+        <div className="login-footer">
+          <p>
+            {isLoginMode ? "Don't have an account? " : "Already have an account? "}
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() => setIsLoginMode(!isLoginMode)}
+            >
+              {isLoginMode ? 'Sign Up' : 'Sign In'}
+            </button>
+          </p>
+          
+          <div className="test-accounts">
+            <h4>🧪 Test Accounts:</h4>
+            <p><strong>Lecturer:</strong> lecturer@test.com / password123</p>
+            <p><strong>Student:</strong> student@test.com / password123</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;
+
+/* CSS */
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -5,410 +230,206 @@
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .login-card {
   background: white;
-  border-radius: 25px;
-  padding: 50px 40px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-  max-width: 450px;
+  border-radius: 16px;
+  padding: 40px;
   width: 100%;
+  max-width: 450px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   animation: slideUp 0.6s ease-out;
-  position: relative;
-  overflow: hidden;
-}
-
-.login-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 @keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(40px) scale(0.95);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 .login-header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
-.login-header h1 {
-  color: #333;
-  margin-bottom: 15px;
-  font-size: 2.8rem;
-  font-weight: 700;
+.login-title {
+  font-size: 2.5rem;
+  margin: 0 0 10px 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.login-header p {
+.login-subtitle {
   color: #666;
+  font-size: 1rem;
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 400;
 }
 
-.auth-tabs {
+.login-tabs {
   display: flex;
-  margin-bottom: 35px;
-  border-radius: 15px;
-  overflow: hidden;
+  margin-bottom: 30px;
   background: #f8f9fa;
+  border-radius: 8px;
   padding: 4px;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.tab {
+.tab-btn {
   flex: 1;
-  padding: 15px 20px;
+  padding: 12px;
   border: none;
   background: transparent;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
   font-weight: 600;
-  font-size: 16px;
-  border-radius: 12px;
-  color: #666;
-  position: relative;
+  transition: all 0.3s ease;
 }
 
-.tab:hover {
-  color: #667eea;
-  transform: translateY(-1px);
-}
-
-.tab.active {
+.tab-btn.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-  transform: translateY(-2px);
 }
 
-.auth-form {
+.error-message {
+  background: #ffeaea;
+  color: #d63384;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+  font-size: 14px;
+}
+
+.login-form {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 20px;
 }
 
 .form-group {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333;
   font-weight: 600;
+  color: #333;
   font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .form-input {
-  width: 100%;
-  padding: 18px 20px;
+  padding: 14px 16px;
   border: 2px solid #e1e5e9;
-  border-radius: 15px;
+  border-radius: 8px;
   font-size: 16px;
   transition: all 0.3s ease;
-  box-sizing: border-box;
-  background: white; /* Ensure white background */
-  color: #333; /* Dark text color for visibility */
-  font-family: inherit;
-  font-weight: 400;
+  background: white;
+  color: #333;
 }
 
 .form-input:focus {
   outline: none;
   border-color: #667eea;
-  background: white;
-  color: #333; /* Ensure text stays dark on focus */
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  transform: translateY(-2px);
-}
-
-.form-input:hover {
-  border-color: #c3cfe2;
-  background: white;
-  color: #333; /* Ensure text stays dark on hover */
 }
 
 .form-input::placeholder {
-  color: #999; /* Light gray placeholder */
-  font-style: italic;
-  opacity: 1; /* Ensure placeholder is visible */
+  color: #999;
 }
 
-/* Ensure text is visible in all browsers */
-.form-input:-webkit-autofill,
-.form-input:-webkit-autofill:hover,
-.form-input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px white inset !important;
-  -webkit-text-fill-color: #333 !important;
-  background-color: white !important;
-  color: #333 !important;
-}
-
-/* Firefox autofill */
-.form-input:-moz-autofill {
-  background-color: white !important;
-  color: #333 !important;
-}
-
-.auth-button {
+.login-btn {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 18px 25px;
-  border-radius: 15px;
-  font-size: 16px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  position: relative;
-  overflow: hidden;
-}
-
-.auth-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: left 0.5s;
-}
-
-.auth-button:hover::before {
-  left: 100%;
-}
-
-.auth-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-}
-
-.auth-button:active {
-  transform: translateY(-1px);
-}
-
-.auth-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.auth-button:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-.error-message {
-  background: linear-gradient(135deg, #fee 0%, #fdd 100%);
-  color: #d32f2f;
-  padding: 15px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border: 1px solid #fcc;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: shake 0.5s ease-in-out;
-}
-
-.error-message::before {
-  content: '⚠️';
-  font-size: 18px;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-
-.auth-footer {
-  text-align: center;
-  margin-top: 30px;
-  padding-top: 25px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.auth-footer p {
-  color: #666;
-  margin: 0;
-  font-size: 15px;
-}
-
-.link-button {
-  background: none;
-  border: none;
-  color: #667eea;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: inherit;
-  font-weight: 600;
-  padding: 5px 10px;
+  padding: 16px;
   border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.link-button:hover {
-  color: #764ba2;
-  background: rgba(102, 126, 234, 0.1);
-  transform: translateY(-1px);
-}
-
-/* Success message for registration */
-.success-message {
-  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-  color: #155724;
-  padding: 15px 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  border: 1px solid #c3e6cb;
-  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 10px;
-  animation: slideIn 0.5s ease-out;
+  justify-content: center;
+  gap: 8px;
 }
 
-.success-message::before {
-  content: '✅';
-  font-size: 18px;
+.login-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
-/* Loading state */
-.auth-button.loading {
-  position: relative;
-  color: transparent;
-}
-
-.auth-button.loading::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
   border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* Force text visibility for all input states */
-input[type="text"].form-input,
-input[type="email"].form-input,
-input[type="password"].form-input,
-select.form-input {
-  background-color: white !important;
-  color: #333 !important;
-  -webkit-text-fill-color: #333 !important;
+.login-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
-/* Focus state text visibility */
-input[type="text"].form-input:focus,
-input[type="email"].form-input:focus,
-input[type="password"].form-input:focus,
-select.form-input:focus {
-  background-color: white !important;
-  color: #333 !important;
-  -webkit-text-fill-color: #333 !important;
+.link-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
 }
 
-/* Mobile responsive */
-@media (max-width: 480px) {
+.test-accounts {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.test-accounts h4 {
+  margin: 0 0 8px 0;
+  color: #667eea;
+}
+
+.test-accounts p {
+  margin: 4px 0;
+  color: #666;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
   .login-container {
     padding: 10px;
   }
   
   .login-card {
-    padding: 30px 25px;
-    margin: 10px;
+    padding: 30px 20px;
   }
   
-  .login-header h1 {
-    font-size: 2.2rem;
+  .login-title {
+    font-size: 2rem;
   }
-  
-  .form-input {
-    padding: 15px 18px;
-    font-size: 16px; /* Prevents zoom on iOS */
-    background-color: white !important;
-    color: #333 !important;
-  }
-  
-  .auth-button {
-    padding: 16px 20px;
-  }
-  
-  .auth-tabs {
-    margin-bottom: 25px;
-  }
-  
-  .tab {
-    padding: 12px 15px;
-    font-size: 14px;
-  }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .form-input {
-    border: 3px solid #333 !important;
-    background: white !important;
-    color: #000 !important;
-  }
-  
-  .form-input::placeholder {
-    color: #666 !important;
-  }
-}
-
-/* Ensure text is always visible regardless of browser settings */
-.form-input {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
 }

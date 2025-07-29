@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
-import NetworkStatus from './components/NetworkStatus';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -42,8 +41,7 @@ function App() {
   };
 
   const handleStartQuiz = () => {
-    // For now, just show an alert - Quiz component will be added later
-    alert('Quiz functionality coming soon!');
+    console.log('Starting quiz...');
   };
 
   if (loading) {
@@ -63,7 +61,6 @@ function App() {
 
   return (
     <div className="App">
-      <NetworkStatus />
       {currentView === 'login' && (
         <Login onLogin={handleLogin} />
       )}
