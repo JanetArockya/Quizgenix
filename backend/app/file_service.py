@@ -1,233 +1,156 @@
 import os
-import json
-from docx import Document
-from docx.shared import Inches
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from fpdf import FPDF
-from io import BytesIO
 import tempfile
+from fpdf import FPDF
+import pandas as pd
+from docx import Document
+from datetime import datetime
 
-class QuizFileGenerator:
+class FileService:
     def __init__(self):
         self.temp_dir = tempfile.gettempdir()
     
-    def generate_word_file(self, quiz_data):
-        """Generate Word document with quiz questions"""
-        doc = Document()
-        
-        # Title
-        title = doc.add_heading(f"Quiz: {quiz_data.get('title', 'Untitled Quiz')}", 0)
-        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
-        # Quiz details section
-        details_para = doc.add_paragraph()
-        details_para.add_run("Quiz Details").bold = True
-        details_para.add_run("\n" + "="*50)
-        
-        doc.add_paragraph(f"📚 Subject: {quiz_data.get('subject', 'N/A')}")
-        doc.add_paragraph(f"🎯 Difficulty: {quiz_data.get('difficulty', 'N/A')}")
-        doc.add_paragraph(f"📊 Total Questions: {len(quiz_data.get('questions', []))}")
-        doc.add_paragraph(f"⏰ Estimated Time: {len(quiz_data.get('questions', [])) * 2} minutes")
-        
-        doc.add_paragraph("\n" + "="*50 + "\n")
-        
-        # Instructions
-        instructions = doc.add_paragraph()
-        instructions.add_run("Instructions:").bold = True
-        doc.add_paragraph("• Read each question carefully")
-        doc.add_paragraph("• Choose the best answer from the given options")
-        doc.add_paragraph("• Mark your answers clearly")
-        doc.add_paragraph("• Review your answers before submission")
-        
-        doc.add_paragraph("\n" + "="*50 + "\n")
-        
-        # Questions
-        for i, question in enumerate(quiz_data.get('questions', []), 1):
-            # Question text
-            question_para = doc.add_paragraph()
-            question_para.add_run(f"Question {i}: ").bold = True
-            question_para.add_run(question.get('question', ''))
-            
-            # Options
-            options = question.get('options', [])
-            for j, option in enumerate(options):
-                option_letter = chr(65 + j)  # A, B, C, D
-                option_para = doc.add_paragraph(f"   {option_letter}) {option}")
-                option_para.style = 'List Bullet'
-            
-            # Answer space
-            doc.add_paragraph("Answer: _____")
-            doc.add_paragraph()  # Add space between questions
-        
-        # Answer key section
-        doc.add_page_break()
-        answer_title = doc.add_heading("Answer Key", level=1)
-        answer_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        
-        for i, question in enumerate(quiz_data.get('questions', []), 1):
-            correct_answer = question.get('correct_answer', '')
-            # Find the option letter for the correct answer
-            options = question.get('options', [])
-            answer_letter = 'N/A'
-            for j, option in enumerate(options):
-                if option == correct_answer:
-                    answer_letter = chr(65 + j)
-                    break
-            
-            answer_para = doc.add_paragraph()
-            answer_para.add_run(f"Question {i}: ").bold = True
-            answer_para.add_run(f"{answer_letter}) {correct_answer}")
-        
-        # Save to temporary file
-        filename = f"quiz_{quiz_data.get('id', 'temp')}_{quiz_data.get('title', 'quiz').replace(' ', '_')}.docx"
-        filepath = os.path.join(self.temp_dir, filename)
-        doc.save(filepath)
-        
-        return filepath, filename
-    
-    def generate_pdf_file(self, quiz_data):
-        """Generate PDF document with quiz questions"""
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font('Arial', 'B', 20)
-        
-        # Title
-        title = quiz_data.get('title', 'Untitled Quiz')
-        pdf.cell(0, 15, f'Quiz: {title}', 0, 1, 'C')
-        pdf.ln(5)
-        
-        # Quiz details
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(0, 8, 'Quiz Details', 0, 1)
-        pdf.set_font('Arial', '', 10)
-        pdf.cell(0, 6, '='*80, 0, 1)
-        
-        pdf.cell(0, 6, f"Subject: {quiz_data.get('subject', 'N/A')}", 0, 1)
-        pdf.cell(0, 6, f"Difficulty: {quiz_data.get('difficulty', 'N/A')}", 0, 1)
-        pdf.cell(0, 6, f"Total Questions: {len(quiz_data.get('questions', []))}", 0, 1)
-        pdf.cell(0, 6, f"Estimated Time: {len(quiz_data.get('questions', [])) * 2} minutes", 0, 1)
-        pdf.ln(3)
-        
-        # Instructions
-        pdf.set_font('Arial', 'B', 12)
-        pdf.cell(0, 8, 'Instructions:', 0, 1)
-        pdf.set_font('Arial', '', 10)
-        instructions = [
-            "• Read each question carefully",
-            "• Choose the best answer from the given options", 
-            "• Mark your answers clearly",
-            "• Review your answers before submission"
-        ]
-        for instruction in instructions:
-            pdf.cell(0, 6, instruction.encode('latin-1', 'replace').decode('latin-1'), 0, 1)
-        
-        pdf.ln(5)
-        pdf.cell(0, 5, '='*80, 0, 1)
-        pdf.ln(5)
-        
-        # Questions
-        for i, question in enumerate(quiz_data.get('questions', []), 1):
-            # Check if we need a new page
-            if pdf.get_y() > 250:
-                pdf.add_page()
-            
-            # Question text
-            pdf.set_font('Arial', 'B', 12)
-            pdf.cell(0, 8, f"Question {i}:", 0, 1)
-            
-            pdf.set_font('Arial', '', 11)
-            question_text = question.get('question', '')
-            # Handle long questions by wrapping text
-            if len(question_text) > 85:
-                lines = [question_text[i:i+85] for i in range(0, len(question_text), 85)]
-                for line in lines:
-                    pdf.cell(0, 6, line.encode('latin-1', 'replace').decode('latin-1'), 0, 1)
-            else:
-                pdf.cell(0, 6, question_text.encode('latin-1', 'replace').decode('latin-1'), 0, 1)
-            
-            pdf.ln(2)
-            
-            # Options
-            options = question.get('options', [])
-            for j, option in enumerate(options):
-                option_letter = chr(65 + j)  # A, B, C, D
-                option_text = f"   {option_letter}) {option}"
-                pdf.cell(0, 6, option_text.encode('latin-1', 'replace').decode('latin-1'), 0, 1)
-            
-            pdf.ln(2)
-            pdf.cell(0, 6, "Answer: _____", 0, 1)
-            pdf.ln(6)
-        
-        # Answer key on new page
-        pdf.add_page()
-        pdf.set_font('Arial', 'B', 16)
-        pdf.cell(0, 12, 'Answer Key', 0, 1, 'C')
-        pdf.ln(5)
-        
-        pdf.set_font('Arial', '', 11)
-        for i, question in enumerate(quiz_data.get('questions', []), 1):
-            correct_answer = question.get('correct_answer', '')
-            options = question.get('options', [])
-            answer_letter = 'N/A'
-            for j, option in enumerate(options):
-                if option == correct_answer:
-                    answer_letter = chr(65 + j)
-                    break
-            
-            answer_text = f"Question {i}: {answer_letter}) {correct_answer}"
-            pdf.cell(0, 6, answer_text.encode('latin-1', 'replace').decode('latin-1'), 0, 1)
-        
-        # Save to temporary file
-        filename = f"quiz_{quiz_data.get('id', 'temp')}_{quiz_data.get('title', 'quiz').replace(' ', '_')}.pdf"
-        filepath = os.path.join(self.temp_dir, filename)
-        pdf.output(filepath)
-        
-        return filepath, filename
-
-    def generate_excel_file(self, quiz_data):
-        """Generate Excel file with quiz questions"""
+    def generate_pdf(self, quiz_data):
+        """Generate PDF file for quiz"""
         try:
-            import pandas as pd
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font('Arial', 'B', 16)
             
-            # Prepare data for Excel
-            questions_data = []
-            for i, question in enumerate(quiz_data.get('questions', []), 1):
-                options = question.get('options', [])
-                questions_data.append({
-                    'Question_No': i,
-                    'Question': question.get('question', ''),
-                    'Option_A': options[0] if len(options) > 0 else '',
-                    'Option_B': options[1] if len(options) > 1 else '',
-                    'Option_C': options[2] if len(options) > 2 else '',
-                    'Option_D': options[3] if len(options) > 3 else '',
-                    'Correct_Answer': question.get('correct_answer', ''),
-                    'Subject': quiz_data.get('subject', ''),
-                    'Difficulty': quiz_data.get('difficulty', ''),
-                    'Quiz_Title': quiz_data.get('title', '')
-                })
+            # Title
+            pdf.cell(0, 10, f"Quiz: {quiz_data['title']}", ln=True, align='C')
+            pdf.ln(5)
             
-            df = pd.DataFrame(questions_data)
+            # Quiz info
+            pdf.set_font('Arial', '', 12)
+            pdf.cell(0, 8, f"Subject: {quiz_data['subject']}", ln=True)
+            pdf.cell(0, 8, f"Topic: {quiz_data.get('topic', 'N/A')}", ln=True)
+            pdf.cell(0, 8, f"Difficulty: {quiz_data['difficulty'].capitalize()}", ln=True)
+            pdf.cell(0, 8, f"Total Questions: {len(quiz_data['questions'])}", ln=True)
+            pdf.ln(10)
             
-            # Save to temporary file
-            filename = f"quiz_{quiz_data.get('id', 'temp')}_{quiz_data.get('title', 'quiz').replace(' ', '_')}.xlsx"
-            filepath = os.path.join(self.temp_dir, filename)
-            
-            with pd.ExcelWriter(filepath, engine='openpyxl') as writer:
-                df.to_excel(writer, sheet_name='Quiz Questions', index=False)
+            # Questions
+            for i, question in enumerate(quiz_data['questions'], 1):
+                pdf.set_font('Arial', 'B', 12)
+                pdf.cell(0, 8, f"Question {i}:", ln=True)
                 
-                # Add quiz info sheet
-                quiz_info = pd.DataFrame([
-                    ['Quiz Title', quiz_data.get('title', 'N/A')],
-                    ['Subject', quiz_data.get('subject', 'N/A')],
-                    ['Difficulty', quiz_data.get('difficulty', 'N/A')],
-                    ['Total Questions', len(quiz_data.get('questions', []))],
-                    ['Estimated Time (minutes)', len(quiz_data.get('questions', [])) * 2],
-                    ['Created Date', quiz_data.get('created_at', 'N/A')]
+                pdf.set_font('Arial', '', 11)
+                # Handle long questions with multi_cell
+                pdf.multi_cell(0, 6, question['question'])
+                pdf.ln(2)
+                
+                # Options
+                for j, option in enumerate(question['options']):
+                    option_letter = chr(65 + j)  # A, B, C, D
+                    is_correct = option == question['correct_answer']
+                    marker = " ✓" if is_correct else ""
+                    pdf.cell(0, 5, f"   {option_letter}) {option}{marker}", ln=True)
+                
+                pdf.ln(5)
+            
+            # Save file
+            filename = f"quiz_{quiz_data['title'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+            file_path = os.path.join(self.temp_dir, filename)
+            pdf.output(file_path)
+            
+            return file_path
+            
+        except Exception as e:
+            print(f"Error generating PDF: {e}")
+            raise
+    
+    def generate_word(self, quiz_data):
+        """Generate Word document for quiz"""
+        try:
+            doc = Document()
+            
+            # Title
+            title = doc.add_heading(f"Quiz: {quiz_data['title']}", 0)
+            title.alignment = 1  # Center alignment
+            
+            # Quiz info
+            doc.add_paragraph(f"Subject: {quiz_data['subject']}")
+            doc.add_paragraph(f"Topic: {quiz_data.get('topic', 'N/A')}")
+            doc.add_paragraph(f"Difficulty: {quiz_data['difficulty'].capitalize()}")
+            doc.add_paragraph(f"Total Questions: {len(quiz_data['questions'])}")
+            doc.add_paragraph()
+            
+            # Questions
+            for i, question in enumerate(quiz_data['questions'], 1):
+                # Question heading
+                doc.add_heading(f"Question {i}:", level=2)
+                
+                # Question text
+                doc.add_paragraph(question['question'])
+                
+                # Options
+                for j, option in enumerate(question['options']):
+                    option_letter = chr(65 + j)  # A, B, C, D
+                    is_correct = option == question['correct_answer']
+                    marker = " ✓ (Correct Answer)" if is_correct else ""
+                    
+                    p = doc.add_paragraph()
+                    p.add_run(f"{option_letter}) ").bold = True
+                    p.add_run(f"{option}{marker}")
+                
+                doc.add_paragraph()
+            
+            # Save file
+            filename = f"quiz_{quiz_data['title'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.docx"
+            file_path = os.path.join(self.temp_dir, filename)
+            doc.save(file_path)
+            
+            return file_path
+            
+        except Exception as e:
+            print(f"Error generating Word document: {e}")
+            raise
+    
+    def generate_excel(self, quiz_data):
+        """Generate Excel file for quiz"""
+        try:
+            # Prepare data for Excel
+            data = []
+            
+            for i, question in enumerate(quiz_data['questions'], 1):
+                row = {
+                    'Question_Number': i,
+                    'Question': question['question'],
+                    'Option_A': question['options'][0] if len(question['options']) > 0 else '',
+                    'Option_B': question['options'][1] if len(question['options']) > 1 else '',
+                    'Option_C': question['options'][2] if len(question['options']) > 2 else '',
+                    'Option_D': question['options'][3] if len(question['options']) > 3 else '',
+                    'Correct_Answer': question['correct_answer'],
+                    'Subject': quiz_data['subject'],
+                    'Topic': quiz_data.get('topic', ''),
+                    'Difficulty': quiz_data['difficulty']
+                }
+                data.append(row)
+            
+            # Create DataFrame
+            df = pd.DataFrame(data)
+            
+            # Save file
+            filename = f"quiz_{quiz_data['title'].replace(' ', '_')}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx"
+            file_path = os.path.join(self.temp_dir, filename)
+            
+            with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
+                # Quiz info sheet
+                info_df = pd.DataFrame([
+                    ['Quiz Title', quiz_data['title']],
+                    ['Subject', quiz_data['subject']],
+                    ['Topic', quiz_data.get('topic', 'N/A')],
+                    ['Difficulty', quiz_data['difficulty'].capitalize()],
+                    ['Total Questions', len(quiz_data['questions'])],
+                    ['Generated On', datetime.now().strftime('%Y-%m-%d %H:%M:%S')]
                 ], columns=['Property', 'Value'])
                 
-                quiz_info.to_excel(writer, sheet_name='Quiz Info', index=False)
+                info_df.to_excel(writer, sheet_name='Quiz_Info', index=False)
+                
+                # Questions sheet
+                df.to_excel(writer, sheet_name='Questions', index=False)
             
-            return filepath, filename
+            return file_path
             
-        except ImportError:
-            return None, None
+        except Exception as e:
+            print(f"Error generating Excel file: {e}")
+            raise

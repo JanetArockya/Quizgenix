@@ -1,228 +1,5 @@
-import React, { useState } from 'react';
-import './Login.css';
+/* Login.css - Pure CSS Only (No JavaScript) */
 
-const Login = ({ onLogin }) => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    role: 'student'
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-    if (error) setError('');
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    if (!isLoginMode && formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match!');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const endpoint = isLoginMode ? '/api/login' : '/api/register';
-      const payload = {
-        email: formData.email,
-        password: formData.password
-      };
-      
-      if (!isLoginMode) {
-        payload.name = formData.name;
-        payload.role = formData.role;
-      }
-
-      console.log('🔐 Attempting authentication...');
-
-      const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        console.log('✅ Authentication successful:', data);
-        if (data.user && data.token) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          onLogin(data.user);
-        } else {
-          setError('Authentication failed. Please try again.');
-        }
-      } else {
-        setError(data.error || 'Authentication failed');
-      }
-    } catch (error) {
-      console.error('🚨 Authentication error:', error);
-      if (error.message.includes('fetch')) {
-        setError('🔌 Cannot connect to server. Please ensure the backend is running on http://127.0.0.1:5000');
-      } else {
-        setError('Network error. Please check your connection.');
-      }
-    }
-
-    setLoading(false);
-  };
-
-  return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
-          <h1 className="login-title">🧠 Quizgenix</h1>
-          <p className="login-subtitle">AI-Powered Quiz Generation Platform</p>
-        </div>
-
-        <div className="login-tabs">
-          <button
-            className={`tab-btn ${isLoginMode ? 'active' : ''}`}
-            onClick={() => setIsLoginMode(true)}
-          >
-            Sign In
-          </button>
-          <button
-            className={`tab-btn ${!isLoginMode ? 'active' : ''}`}
-            onClick={() => setIsLoginMode(false)}
-          >
-            Sign Up
-          </button>
-        </div>
-
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="login-form">
-          {!isLoginMode && (
-            <div className="form-group">
-              <label>Full Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Enter your full name"
-                required
-                className="form-input"
-              />
-            </div>
-          )}
-
-          <div className="form-group">
-            <label>Email Address</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Enter your email"
-              required
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Enter your password"
-              required
-              className="form-input"
-            />
-          </div>
-
-          {!isLoginMode && (
-            <>
-              <div className="form-group">
-                <label>Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  placeholder="Confirm your password"
-                  required
-                  className="form-input"
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Role</label>
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                  className="form-input"
-                >
-                  <option value="student">🎓 Student</option>
-                  <option value="lecturer">👨‍🏫 Lecturer</option>
-                </select>
-              </div>
-            </>
-          )}
-
-          <button 
-            type="submit" 
-            className="login-btn"
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="loading-spinner"></span>
-                {isLoginMode ? 'Signing In...' : 'Signing Up...'}
-              </>
-            ) : (
-              isLoginMode ? 'Sign In' : 'Sign Up'
-            )}
-          </button>
-        </form>
-
-        <div className="login-footer">
-          <p>
-            {isLoginMode ? "Don't have an account? " : "Already have an account? "}
-            <button
-              type="button"
-              className="link-btn"
-              onClick={() => setIsLoginMode(!isLoginMode)}
-            >
-              {isLoginMode ? 'Sign Up' : 'Sign In'}
-            </button>
-          </p>
-          
-          <div className="test-accounts">
-            <h4>🧪 Test Accounts:</h4>
-            <p><strong>Lecturer:</strong> lecturer@test.com / password123</p>
-            <p><strong>Student:</strong> student@test.com / password123</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Login;
-
-/* CSS */
 .login-container {
   min-height: 100vh;
   display: flex;
@@ -230,6 +7,7 @@ export default Login;
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .login-card {
@@ -238,7 +16,7 @@ export default Login;
   padding: 40px;
   width: 100%;
   max-width: 450px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   animation: slideUp 0.6s ease-out;
 }
 
@@ -258,22 +36,23 @@ export default Login;
   margin-bottom: 30px;
 }
 
-.login-title {
+.login-header h1 {
   font-size: 2.5rem;
   margin: 0 0 10px 0;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-weight: 700;
 }
 
-.login-subtitle {
+.login-header p {
   color: #666;
   font-size: 1rem;
   margin: 0;
 }
 
-.login-tabs {
+.auth-tabs {
   display: flex;
   margin-bottom: 30px;
   background: #f8f9fa;
@@ -281,33 +60,48 @@ export default Login;
   padding: 4px;
 }
 
-.tab-btn {
+.tab {
   flex: 1;
-  padding: 12px;
+  padding: 12px 16px;
   border: none;
   background: transparent;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+  font-size: 14px;
   transition: all 0.3s ease;
+  font-family: inherit;
 }
 
-.tab-btn.active {
+.tab:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.tab.active {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .error-message {
   background: #ffeaea;
   color: #d63384;
-  padding: 12px;
+  padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 20px;
   border: 1px solid #f5c6cb;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.login-form {
+.error-message::before {
+  content: "⚠️";
+  font-size: 16px;
+}
+
+.auth-form {
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -316,13 +110,6 @@ export default Login;
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-weight: 600;
-  color: #333;
-  font-size: 14px;
 }
 
 .form-input {
@@ -333,42 +120,54 @@ export default Login;
   transition: all 0.3s ease;
   background: white;
   color: #333;
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-input:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+.form-input:hover {
+  border-color: #c3c8d4;
 }
 
 .form-input::placeholder {
   color: #999;
+  font-style: italic;
 }
 
-.login-btn {
+.auth-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  padding: 16px;
+  padding: 16px 24px;
   border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  font-family: inherit;
+  min-height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
 
-.login-btn:hover:not(:disabled) {
+.auth-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
 }
 
-.login-btn:disabled {
+.auth-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+  transform: none;
 }
 
 .loading-spinner {
@@ -385,51 +184,66 @@ export default Login;
   100% { transform: rotate(360deg); }
 }
 
-.login-footer {
+.auth-footer {
   text-align: center;
   margin-top: 30px;
   padding-top: 20px;
   border-top: 1px solid #eee;
 }
 
-.link-btn {
+.auth-footer p {
+  margin: 0 0 10px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.link-button {
   background: none;
   border: none;
   color: #667eea;
   cursor: pointer;
   font-weight: 600;
   text-decoration: underline;
+  font-size: 14px;
+  font-family: inherit;
 }
 
-.test-accounts {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  font-size: 12px;
-}
-
-.test-accounts h4 {
-  margin: 0 0 8px 0;
-  color: #667eea;
-}
-
-.test-accounts p {
-  margin: 4px 0;
-  color: #666;
+.link-button:hover {
+  color: #5a6fd8;
+  text-decoration: none;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
   .login-container {
-    padding: 10px;
+    padding: 15px;
   }
   
   .login-card {
-    padding: 30px 20px;
+    padding: 30px 25px;
   }
   
-  .login-title {
+  .login-header h1 {
     font-size: 2rem;
+  }
+  
+  .form-input {
+    font-size: 16px;
+    padding: 12px 14px;
+  }
+  
+  .auth-button {
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 25px 20px;
+  }
+  
+  .login-header h1 {
+    font-size: 1.8rem;
   }
 }

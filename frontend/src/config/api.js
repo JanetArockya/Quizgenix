@@ -8,15 +8,21 @@ export const apiConfig = {
   }
 };
 
+export const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` }),
+  };
+};
+
 export const apiCall = async (endpoint, options = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  const token = localStorage.getItem('token');
   
   const config = {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...getAuthHeaders(),
       ...options.headers,
     },
   };
@@ -33,8 +39,7 @@ export const apiCall = async (endpoint, options = {}) => {
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
     
-    const data = await response.json();
-    return data;
+    return await response.json();
     
   } catch (error) {
     console.error(`❌ API Error for ${endpoint}:`, error);

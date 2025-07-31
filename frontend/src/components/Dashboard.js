@@ -1,44 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
 
-const Dashboard = ({ user, onLogout, onStartQuiz }) => {
+const Dashboard = ({ user, onLogout }) => {
+  // State management - MISSING in your current file
   const [activeTab, setActiveTab] = useState('create');
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPreview, setShowPreview] = useState(false);
-  const [currentQuiz, setCurrentQuiz] = useState(null);
-  const [editingQuestion, setEditingQuestion] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     subject: '',
     topic: '',
     difficulty: 'medium',
-    questionCount: 10
+    questionCount: '10'
   });
+  const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState(null);
 
-  // Fetch quizzes on component mount
+  // Load user's quizzes on component mount
   useEffect(() => {
-    if (user.role === 'lecturer') {
-      fetchQuizzes();
+    if (user?.role === 'lecturer') {
+      loadQuizzes();
     }
-  }, [user.role]);
+  }, [user]);
 
-  const fetchQuizzes = async () => {
+  // API Functions
+  const loadQuizzes = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://127.0.0.1:5000/api/quizzes', {
         headers: {
           'Authorization': `Bearer ${token}`,
-        },
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.ok) {
         const data = await response.json();
         setQuizzes(data.quizzes || []);
+      } else {
+        console.error('Failed to load quizzes');
       }
     } catch (error) {
-      console.error('Error fetching quizzes:', error);
+      console.error('Error loading quizzes:', error);
     }
   };
 
@@ -60,10 +65,10 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
       const response = await fetch('http://127.0.0.1:5000/api/quiz', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
       const data = await response.json();
@@ -71,177 +76,134 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
       if (response.ok) {
         setCurrentQuiz(data);
         setShowPreview(true);
+        setActiveTab('manage');
+        await loadQuizzes(); // Refresh quiz list
+        
+        // Reset form
         setFormData({
           title: '',
           subject: '',
           topic: '',
           difficulty: 'medium',
-          questionCount: 10
+          questionCount: '10'
         });
       } else {
         setError(data.error || 'Failed to create quiz');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      setError('Network error. Please ensure the backend is running.');
+      console.error('Error creating quiz:', error);
     }
 
     setLoading(false);
   };
 
-  const handleSaveQuiz = async () => {
+  const handleDownload = async (quizId, format) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      
-      const response = await fetch(`http://127.0.0.1:5000/api/quiz/${currentQuiz.id}/save`, {
-        method: 'PUT',
+      const response = await fetch(`http://127.0.0.1:5000/api/quiz/${quizId}/download/${format}`, {
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(currentQuiz),
-      });
-
-      if (response.ok) {
-        setShowPreview(false);
-        setCurrentQuiz(null);
-        fetchQuizzes();
-        alert('Quiz saved successfully!');
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Failed to save quiz');
-      }
-    } catch (error) {
-      setError('Failed to save quiz. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEditQuestion = (questionIndex) => {
-    setEditingQuestion({
-      index: questionIndex,
-      ...currentQuiz.questions[questionIndex]
-    });
-  };
-
-  const handleUpdateQuestion = () => {
-    const updatedQuestions = [...currentQuiz.questions];
-    updatedQuestions[editingQuestion.index] = {
-      question: editingQuestion.question,
-      options: editingQuestion.options,
-      correct_answer: editingQuestion.correct_answer
-    };
-    
-    setCurrentQuiz({
-      ...currentQuiz,
-      questions: updatedQuestions
-    });
-    
-    setEditingQuestion(null);
-  };
-
-  const handleDeleteQuestion = (questionIndex) => {
-    if (window.confirm('Are you sure you want to delete this question?')) {
-      const updatedQuestions = currentQuiz.questions.filter((_, index) => index !== questionIndex);
-      setCurrentQuiz({
-        ...currentQuiz,
-        questions: updatedQuestions
-      });
-    }
-  };
-
-  const handleDownload = async (quizId, fileType) => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`http://127.0.0.1:5000/api/quiz/${quizId}/download/${fileType}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const contentDisposition = response.headers.get('content-disposition');
-        let filename = `quiz_${quizId}.${fileType === 'word' ? 'docx' : fileType === 'excel' ? 'xlsx' : 'pdf'}`;
-        
-        if (contentDisposition) {
-          const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-          if (filenameMatch) {
-            filename = filenameMatch[1];
-          }
+          'Authorization': `Bearer ${token}`
         }
+      });
 
+      if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
+        a.style.display = 'none';
         a.href = url;
-        a.download = filename;
+        a.download = `quiz.${format === 'word' ? 'docx' : format}`;
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
-        
-        setError('');
+        document.body.removeChild(a);
       } else {
-        const errorData = await response.json();
-        setError(errorData.error || 'Download failed');
+        setError('Failed to download file');
       }
     } catch (error) {
+      setError('Download failed');
       console.error('Download error:', error);
-      setError('Failed to download file. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Quiz Preview Modal Component
+  const handleEditQuestion = (question, index) => {
+    setEditingQuestion({ ...question, index });
+  };
+
+  const handleSaveQuestion = async (updatedQuestion) => {
+    if (currentQuiz) {
+      const updatedQuestions = [...currentQuiz.questions];
+      updatedQuestions[updatedQuestion.index] = {
+        question: updatedQuestion.question,
+        options: updatedQuestion.options,
+        correct_answer: updatedQuestion.correct_answer
+      };
+
+      const updatedQuiz = { ...currentQuiz, questions: updatedQuestions };
+      setCurrentQuiz(updatedQuiz);
+
+      // Save to backend
+      try {
+        const token = localStorage.getItem('token');
+        await fetch(`http://127.0.0.1:5000/api/quiz/${currentQuiz.id}/save`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            questions: updatedQuestions
+          })
+        });
+        
+        await loadQuizzes(); // Refresh quiz list
+      } catch (error) {
+        console.error('Error saving question:', error);
+      }
+    }
+    setEditingQuestion(null);
+  };
+
+  // Modal Components
   const QuizPreview = () => {
     if (!showPreview || !currentQuiz) return null;
 
     return (
-      <div className="quiz-preview-overlay">
-        <div className="quiz-preview-modal">
-          <div className="preview-header">
+      <div className="modal-overlay" onClick={() => setShowPreview(false)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
             <h2>📋 Quiz Preview: {currentQuiz.title}</h2>
-            <div className="preview-actions">
-              <button onClick={handleSaveQuiz} className="save-btn" disabled={loading}>
-                💾 Save Quiz
-              </button>
-              <button onClick={() => setShowPreview(false)} className="close-btn">
-                ✖️ Close
-              </button>
-            </div>
+            <button 
+              className="close-btn"
+              onClick={() => setShowPreview(false)}
+            >
+              ×
+            </button>
           </div>
           
-          <div className="preview-content">
-            <div className="quiz-info-bar">
-              <span>📚 Subject: {currentQuiz.subject}</span>
-              <span>🎯 Difficulty: {currentQuiz.difficulty}</span>
-              <span>📊 Questions: {currentQuiz.questions?.length || 0}</span>
+          <div className="modal-body">
+            <div className="quiz-info">
+              <p><strong>Subject:</strong> {currentQuiz.subject}</p>
+              <p><strong>Topic:</strong> {currentQuiz.topic}</p>
+              <p><strong>Difficulty:</strong> {currentQuiz.difficulty}</p>
+              <p><strong>Questions:</strong> {currentQuiz.questions?.length || 0}</p>
             </div>
 
-            <div className="questions-preview">
+            <div className="questions-list">
               {currentQuiz.questions?.map((question, index) => (
-                <div key={index} className="question-preview-card">
+                <div key={index} className="question-preview">
                   <div className="question-header">
-                    <h3>Question {index + 1}</h3>
-                    <div className="question-actions">
-                      <button 
-                        onClick={() => handleEditQuestion(index)}
-                        className="edit-btn"
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button 
-                        onClick={() => handleDeleteQuestion(index)}
-                        className="delete-btn"
-                      >
-                        🗑️ Delete
-                      </button>
-                    </div>
+                    <h4>Question {index + 1}</h4>
+                    <button 
+                      className="edit-btn"
+                      onClick={() => handleEditQuestion(question, index)}
+                    >
+                      ✏️ Edit
+                    </button>
                   </div>
                   
                   <p className="question-text">{question.question}</p>
@@ -250,11 +212,11 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                     {question.options?.map((option, optIndex) => (
                       <div 
                         key={optIndex} 
-                        className={`option-item ${option === question.correct_answer ? 'correct' : ''}`}
+                        className={`option ${option === question.correct_answer ? 'correct' : ''}`}
                       >
                         <span className="option-letter">{String.fromCharCode(65 + optIndex)}</span>
                         <span className="option-text">{option}</span>
-                        {option === question.correct_answer && <span className="correct-badge">✅</span>}
+                        {option === question.correct_answer && <span className="correct-mark">✓</span>}
                       </div>
                     ))}
                   </div>
@@ -262,78 +224,126 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
               ))}
             </div>
           </div>
+
+          <div className="modal-footer">
+            <div className="download-actions">
+              <button 
+                onClick={() => handleDownload(currentQuiz.id, 'pdf')}
+                className="download-btn pdf"
+                disabled={loading}
+              >
+                📄 Download PDF
+              </button>
+              <button 
+                onClick={() => handleDownload(currentQuiz.id, 'word')}
+                className="download-btn word"
+                disabled={loading}
+              >
+                📝 Download Word
+              </button>
+              <button 
+                onClick={() => handleDownload(currentQuiz.id, 'excel')}
+                className="download-btn excel"
+                disabled={loading}
+              >
+                📊 Download Excel
+              </button>
+            </div>
+            <button 
+              className="close-modal-btn"
+              onClick={() => setShowPreview(false)}
+            >
+              Close Preview
+            </button>
+          </div>
         </div>
       </div>
     );
   };
 
-  // Question Edit Modal Component
   const QuestionEditModal = () => {
     if (!editingQuestion) return null;
 
+    const [editForm, setEditForm] = useState({
+      question: editingQuestion.question,
+      options: [...editingQuestion.options],
+      correct_answer: editingQuestion.correct_answer
+    });
+
+    const handleEditFormChange = (field, value, index = null) => {
+      if (field === 'option') {
+        const newOptions = [...editForm.options];
+        newOptions[index] = value;
+        setEditForm({ ...editForm, options: newOptions });
+      } else {
+        setEditForm({ ...editForm, [field]: value });
+      }
+    };
+
+    const saveQuestion = () => {
+      handleSaveQuestion({
+        ...editForm,
+        index: editingQuestion.index
+      });
+    };
+
     return (
-      <div className="edit-modal-overlay">
-        <div className="edit-modal">
-          <div className="edit-modal-header">
-            <h3>✏️ Edit Question {editingQuestion.index + 1}</h3>
-            <button onClick={() => setEditingQuestion(null)} className="close-btn">✖️</button>
+      <div className="modal-overlay" onClick={() => setEditingQuestion(null)}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <h2>✏️ Edit Question {editingQuestion.index + 1}</h2>
+            <button 
+              className="close-btn"
+              onClick={() => setEditingQuestion(null)}
+            >
+              ×
+            </button>
           </div>
           
-          <div className="edit-modal-content">
+          <div className="modal-body">
             <div className="form-group">
               <label>Question:</label>
               <textarea
-                value={editingQuestion.question}
-                onChange={(e) => setEditingQuestion({
-                  ...editingQuestion,
-                  question: e.target.value
-                })}
-                className="question-textarea"
+                value={editForm.question}
+                onChange={(e) => handleEditFormChange('question', e.target.value)}
+                className="form-input"
                 rows="3"
               />
             </div>
 
             <div className="options-edit">
               <label>Options:</label>
-              {editingQuestion.options?.map((option, index) => (
-                <div key={index} className="option-edit-group">
+              {editForm.options.map((option, index) => (
+                <div key={index} className="option-edit">
                   <span className="option-label">{String.fromCharCode(65 + index)})</span>
                   <input
                     type="text"
                     value={option}
-                    onChange={(e) => {
-                      const newOptions = [...editingQuestion.options];
-                      newOptions[index] = e.target.value;
-                      setEditingQuestion({
-                        ...editingQuestion,
-                        options: newOptions
-                      });
-                    }}
-                    className="option-input"
+                    onChange={(e) => handleEditFormChange('option', e.target.value, index)}
+                    className="form-input"
                   />
                   <input
                     type="radio"
-                    name="correctAnswer"
-                    checked={option === editingQuestion.correct_answer}
-                    onChange={() => setEditingQuestion({
-                      ...editingQuestion,
-                      correct_answer: option
-                    })}
-                    className="correct-radio"
+                    name="correct"
+                    checked={option === editForm.correct_answer}
+                    onChange={() => handleEditFormChange('correct_answer', option)}
                   />
-                  <label className="radio-label">Correct</label>
+                  <span>Correct</span>
                 </div>
               ))}
             </div>
+          </div>
 
-            <div className="edit-actions">
-              <button onClick={handleUpdateQuestion} className="update-btn">
-                ✅ Update Question
-              </button>
-              <button onClick={() => setEditingQuestion(null)} className="cancel-btn">
-                ❌ Cancel
-              </button>
-            </div>
+          <div className="modal-footer">
+            <button className="save-btn" onClick={saveQuestion}>
+              💾 Save Changes
+            </button>
+            <button 
+              className="cancel-btn" 
+              onClick={() => setEditingQuestion(null)}
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -345,13 +355,13 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
       <div className="dashboard-header">
         <div className="header-content">
           <div className="dashboard-title">
-            <span className="welcome">Welcome back!</span>
-            <span className="user-name">{user.name}</span>
+            <span className="welcome">Welcome back, {user?.name || 'User'}!</span>
+            <span className="user-role">{user?.role || 'Guest'}</span>
           </div>
           <div className="header-actions">
-            <span className="role-badge">{user.role}</span>
+            <span className="role-badge">{user?.role}</span>
             <button onClick={onLogout} className="logout-btn">
-              Logout
+              🚪 Logout
             </button>
           </div>
         </div>
@@ -359,7 +369,7 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
 
       <div className="dashboard-main">
         <div className="dashboard-content">
-          {user.role === 'lecturer' ? (
+          {user?.role === 'lecturer' ? (
             <>
               <div className="dashboard-tabs">
                 <button
@@ -374,7 +384,7 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                   onClick={() => setActiveTab('manage')}
                 >
                   <span className="tab-icon">📚</span>
-                  My Quizzes
+                  My Quizzes ({quizzes.length})
                 </button>
                 <button
                   className={`tab-btn ${activeTab === 'analytics' ? 'active' : ''}`}
@@ -388,11 +398,11 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
               <div className="tab-content">
                 {activeTab === 'create' && (
                   <div className="create-quiz-section">
-                    <h2>Create New Quiz</h2>
+                    <h2>✨ Create New Quiz</h2>
                     
                     {error && (
                       <div className="error-message">
-                        {error}
+                        ⚠️ {error}
                       </div>
                     )}
 
@@ -475,7 +485,7 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                       >
                         {loading ? (
                           <>
-                            <span className="loading-spinner-small"></span>
+                            <span className="loading-spinner"></span>
                             Generating Quiz...
                           </>
                         ) : (
@@ -491,7 +501,7 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                 {activeTab === 'manage' && (
                   <div className="manage-quiz-section">
                     <div className="section-header">
-                      <h2>My Quizzes</h2>
+                      <h2>📚 My Quizzes</h2>
                       <div className="quiz-stats">
                         <div className="stat-card">
                           <span className="stat-number">{quizzes.length}</span>
@@ -502,12 +512,14 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
 
                     {quizzes.length === 0 ? (
                       <div className="empty-state">
-                        <p>📝 No quizzes created yet</p>
+                        <div className="empty-icon">📝</div>
+                        <h3>No quizzes created yet</h3>
+                        <p>Create your first quiz to get started!</p>
                         <button 
                           onClick={() => setActiveTab('create')}
                           className="action-btn"
                         >
-                          Create Your First Quiz
+                          ✨ Create Your First Quiz
                         </button>
                       </div>
                     ) : (
@@ -522,12 +534,22 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                             </div>
                             
                             <div className="quiz-details">
-                              <span>📚 {quiz.subject}</span>
-                              <span>🎯 {quiz.difficulty}</span>
-                              <span>📊 {quiz.questions?.length || 0} Questions</span>
+                              <span className="detail">📚 {quiz.subject}</span>
+                              <span className="detail">🎯 {quiz.topic}</span>
+                              <span className="detail">⚡ {quiz.difficulty}</span>
+                              <span className="detail">📊 {quiz.questions?.length || 0} Questions</span>
                             </div>
 
                             <div className="quiz-actions">
+                              <button 
+                                onClick={() => {
+                                  setCurrentQuiz(quiz);
+                                  setShowPreview(true);
+                                }}
+                                className="preview-btn"
+                              >
+                                👁️ Preview
+                              </button>
                               <button 
                                 onClick={() => handleDownload(quiz.id, 'pdf')}
                                 className="download-btn pdf"
@@ -549,15 +571,6 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                               >
                                 📊 Excel
                               </button>
-                              <button 
-                                onClick={() => {
-                                  setCurrentQuiz(quiz);
-                                  setShowPreview(true);
-                                }}
-                                className="edit-quiz-btn"
-                              >
-                                ✏️ Edit
-                              </button>
                             </div>
                           </div>
                         ))}
@@ -570,8 +583,15 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
                   <div className="analytics-section">
                     <h2>📊 Quiz Analytics</h2>
                     <div className="coming-soon">
-                      <p>📈 Analytics dashboard coming soon...</p>
-                      <p>Track student performance, quiz completion rates, and more!</p>
+                      <div className="coming-soon-icon">📈</div>
+                      <h3>Analytics Dashboard Coming Soon</h3>
+                      <p>Track student performance, quiz completion rates, and detailed insights!</p>
+                      <div className="feature-list">
+                        <div className="feature">✅ Student Performance Tracking</div>
+                        <div className="feature">✅ Quiz Completion Analytics</div>
+                        <div className="feature">✅ Difficulty Analysis</div>
+                        <div className="feature">✅ Subject Performance Metrics</div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -580,10 +600,17 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
           ) : (
             // Student Dashboard
             <div className="student-dashboard">
-              <h2>🎓 Available Quizzes</h2>
+              <h2>🎓 Student Portal</h2>
               <div className="coming-soon">
-                <p>📚 Student quiz interface coming soon...</p>
+                <div className="coming-soon-icon">📚</div>
+                <h3>Student Quiz Interface Coming Soon</h3>
                 <p>Take quizzes, view scores, and track your progress!</p>
+                <div className="feature-list">
+                  <div className="feature">✅ Interactive Quiz Taking</div>
+                  <div className="feature">✅ Real-time Scoring</div>
+                  <div className="feature">✅ Progress Tracking</div>
+                  <div className="feature">✅ Performance Analytics</div>
+                </div>
               </div>
             </div>
           )}
@@ -593,6 +620,14 @@ const Dashboard = ({ user, onLogout, onStartQuiz }) => {
       {/* Modals */}
       <QuizPreview />
       <QuestionEditModal />
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner-large"></div>
+          <p>Processing...</p>
+        </div>
+      )}
     </div>
   );
 };

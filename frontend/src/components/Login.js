@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import './Login.css';
-import apiCall from '../config/api';
 
 const Login = ({ onLogin }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -8,8 +7,8 @@ const Login = ({ onLogin }) => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'student',
-    name: ''
+    name: '',
+    role: 'student'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,8 +26,15 @@ const Login = ({ onLogin }) => {
     setLoading(true);
     setError('');
 
+    // Validation
     if (!isLoginMode && formData.password !== formData.confirmPassword) {
       setError('Passwords do not match!');
+      setLoading(false);
+      return;
+    }
+
+    if (!isLoginMode && formData.password.length < 6) {
+      setError('Password must be at least 6 characters long!');
       setLoading(false);
       return;
     }
@@ -45,36 +51,53 @@ const Login = ({ onLogin }) => {
         payload.role = formData.role;
       }
 
-      console.log('🔐 Attempting authentication...');
+      console.log('🔐 Attempting authentication...', { endpoint, email: payload.email });
 
-      const data = await apiCall(endpoint, {
+      const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload),
       });
 
-      console.log('✅ Authentication successful:', data);
+      const data = await response.json();
+      console.log('📡 Server response:', data);
 
-      if (data.user && data.token) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        onLogin(data.user);
+      if (response.ok) {
+        console.log('✅ Authentication successful:', data);
+        if (data.user && data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('user', JSON.stringify(data.user));
+          onLogin(data.user);
+        } else {
+          setError('Invalid response from server. Please try again.');
+        }
       } else {
-        setError('Authentication failed. Please try again.');
+        setError(data.error || `Server error: ${response.status}`);
       }
-
     } catch (error) {
-      console.error('🚨 Authentication error:', error);
-      
-      if (error.message.includes('Cannot connect to server')) {
+      console.error('🚨 Network error:', error);
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
         setError('🔌 Cannot connect to server. Please ensure the backend is running on http://127.0.0.1:5000');
-      } else if (error.message.includes('Network error')) {
-        setError('🌐 Network error. Please check your internet connection.');
       } else {
-        setError(error.message || 'Authentication failed. Please try again.');
+        setError('Network error. Please check your connection and try again.');
       }
     }
 
     setLoading(false);
+  };
+
+  const switchMode = () => {
+    setIsLoginMode(!isLoginMode);
+    setError('');
+    setFormData({
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: '',
+      role: 'student'
+    });
   };
 
   return (
@@ -82,7 +105,7 @@ const Login = ({ onLogin }) => {
       <div className="login-card">
         <div className="login-header">
           <h1>🧠 Quizgenix</h1>
-          <p>Smart Quiz Generation Platform</p>
+          <p>AI-Powered Quiz Generation Platform</p>
         </div>
 
         <div className="auth-tabs">
@@ -90,13 +113,13 @@ const Login = ({ onLogin }) => {
             className={`tab ${isLoginMode ? 'active' : ''}`}
             onClick={() => setIsLoginMode(true)}
           >
-            Login
+            Sign In
           </button>
           <button 
             className={`tab ${!isLoginMode ? 'active' : ''}`}
             onClick={() => setIsLoginMode(false)}
           >
-            Register
+            Sign Up
           </button>
         </div>
 
@@ -115,8 +138,9 @@ const Login = ({ onLogin }) => {
                 placeholder="Full Name"
                 value={formData.name}
                 onChange={handleInputChange}
-                required={!isLoginMode}
+                required
                 className="form-input"
+                minLength="2"
               />
             </div>
           )}
@@ -142,6 +166,7 @@ const Login = ({ onLogin }) => {
               onChange={handleInputChange}
               required
               className="form-input"
+              minLength="6"
             />
           </div>
 
@@ -154,8 +179,9 @@ const Login = ({ onLogin }) => {
                   placeholder="Confirm Password"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  required={!isLoginMode}
+                  required
                   className="form-input"
+                  minLength="6"
                 />
               </div>
 
@@ -166,8 +192,8 @@ const Login = ({ onLogin }) => {
                   onChange={handleInputChange}
                   className="form-input"
                 >
-                  <option value="student">Student</option>
-                  <option value="lecturer">Lecturer</option>
+                  <option value="student">🎓 Student</option>
+                  <option value="lecturer">👨‍🏫 Lecturer</option>
                 </select>
               </div>
             </>
@@ -178,16 +204,67 @@ const Login = ({ onLogin }) => {
             className="auth-button"
             disabled={loading}
           >
-            {loading ? 'Processing...' : (isLoginMode ? 'Login' : 'Register')}
+            {loading ? (
+              <>
+                <span className="loading-spinner"></span>
+                {isLoginMode ? 'Signing In...' : 'Creating Account...'}
+              </>
+            ) : (
+              isLoginMode ? 'Sign In' : 'Create Account'
+            )}
           </button>
         </form>
 
         <div className="auth-footer">
-          {isLoginMode ? (
-            <p>Don't have an account? <button onClick={() => setIsLoginMode(false)} className="link-button">Register here</button></p>
-          ) : (
-            <p>Already have an account? <button onClick={() => setIsLoginMode(true)} className="link-button">Login here</button></p>
-          )}
+          <p>
+            {isLoginMode ? "Don't have an account? " : "Already have an account? "}
+            <button 
+              onClick={switchMode}
+              className="link-button"
+              type="button"
+            >
+              {isLoginMode ? 'Sign Up' : 'Sign In'}
+            </button>
+          </p>
+          
+          <div style={{ 
+            marginTop: '20px', 
+            padding: '15px', 
+            background: '#f8f9fa', 
+            borderRadius: '8px', 
+            fontSize: '12px',
+            border: '1px solid #e9ecef'
+          }}>
+            <h4 style={{ 
+              margin: '0 0 10px 0', 
+              color: '#667eea', 
+              textAlign: 'center',
+              fontSize: '13px',
+              fontWeight: '600'
+            }}>
+              🧪 Test Accounts:
+            </h4>
+            <p style={{ 
+              margin: '5px 0', 
+              fontFamily: 'Courier New, monospace',
+              background: 'white',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6'
+            }}>
+              <strong>Lecturer:</strong> lecturer@test.com / password123
+            </p>
+            <p style={{ 
+              margin: '5px 0', 
+              fontFamily: 'Courier New, monospace',
+              background: 'white',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              border: '1px solid #dee2e6'
+            }}>
+              <strong>Student:</strong> student@test.com / password123
+            </p>
+          </div>
         </div>
       </div>
     </div>
