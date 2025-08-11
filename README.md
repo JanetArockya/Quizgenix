@@ -6,6 +6,9 @@
 ![Python](https://img.shields.io/badge/Python-3.13-green?style=for-the-badge&logo=python)
 ![React](https://img.shields.io/badge/React-18.0-blue?style=for-the-badge&logo=react)
 ![Flask](https://img.shields.io/badge/Flask-3.0-red?style=for-the-badge&logo=flask)
+![GitHub Stars](https://img.shields.io/github/stars/JanetArockya/Quizgenix?style=for-the-badge)
+![GitHub Forks](https://img.shields.io/github/forks/JanetArockya/Quizgenix?style=for-the-badge)
+![GitHub Issues](https://img.shields.io/github/issues/JanetArockya/Quizgenix?style=for-the-badge)
 
 ## ✨ Features
 
@@ -67,8 +70,8 @@
 ### **Backend Setup**
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/quizgenix.git
-cd quizgenix/backend
+git clone https://github.com/JanetArockya/Quizgenix.git
+cd Quizgenix/backend
 
 # Create virtual environment
 python -m venv venv
@@ -92,6 +95,10 @@ npm install
 # Start development server
 npm start
 ```
+
+### **Access the Application**
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:5000
 
 ### **Test Accounts**
 - **Lecturer**: `lecturer@test.com` / `password123`
@@ -120,7 +127,7 @@ npm start
 ## 🎯 **Project Structure**
 
 ```
-quizgenix/
+Quizgenix/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py          # Main Flask application
@@ -194,9 +201,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 **Author**
 
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+**Janet Arockya**
+- GitHub: [@JanetArockya](https://github.com/JanetArockya)
+- Repository: [Quizgenix](https://github.com/JanetArockya/Quizgenix)
+
+## 🏆 **Project Highlights**
+
+- ✅ **AI-Powered**: Advanced question generation with 4 knowledge domains
+- ✅ **Real-time**: Interactive quiz taking with live progress tracking
+- ✅ **Verified**: Authoritative references for answer verification
+- ✅ **Responsive**: Mobile-first design with modern UI
+- ✅ **Secure**: JWT authentication with role-based access
+- ✅ **Exportable**: Multiple file formats (PDF, Word, Excel)
 
 ## 🎉 **Acknowledgments**
 
@@ -206,12 +222,18 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **React Team** - Frontend framework
 - **Flask Team** - Backend framework
 
+## 📈 **Stats**
+
+![GitHub Stats](https://github-readme-stats.vercel.app/api?username=JanetArockya&show_icons=true&theme=radical)
+
 ---
 
 <div align="center">
 
-**Made with ❤️ and lots of ☕**
+**Made with ❤️ and lots of ☕ by Janet Arockya**
 
-[⭐ Star this repo](https://github.com/yourusername/quizgenix) • [🐛 Report Bug](https://github.com/yourusername/quizgenix/issues) • [✨ Request Feature](https://github.com/yourusername/quizgenix/issues)
+[⭐ Star this repo](https://github.com/JanetArockya/Quizgenix) • [🐛 Report Bug](https://github.com/JanetArockya/Quizgenix/issues) • [✨ Request Feature](https://github.com/JanetArockya/Quizgenix/issues)
+
+**[🚀 Live Demo](https://github.com/JanetArockya/Quizgenix) | [📖 Documentation](https://github.com/JanetArockya/Quizgenix/wiki) | [💬 Discussions](https://github.com/JanetArockya/Quizgenix/discussions)**
 
 </div>
