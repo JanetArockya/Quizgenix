@@ -8,21 +8,17 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing authentication
     const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
+    const userData = localStorage.getItem('user');
     
-    if (token && savedUser) {
+    if (token && userData) {
       try {
-        const userData = JSON.parse(savedUser);
-        setUser(userData);
+        setUser(JSON.parse(userData));
       } catch (error) {
-        console.error('Error parsing saved user:', error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
     }
-    
     setLoading(false);
   }, []);
 
@@ -38,11 +34,13 @@ function App() {
 
   if (loading) {
     return (
-      <div className="App">
-        <div className="loading-screen">
-          <div className="loading-spinner-large"></div>
-          <p>Loading Quizgenix...</p>
-        </div>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh'
+      }}>
+        Loading...
       </div>
     );
   }
@@ -50,10 +48,7 @@ function App() {
   return (
     <div className="App">
       {user ? (
-        <Dashboard 
-          user={user} 
-          onLogout={handleLogout}
-        />
+        <Dashboard user={user} onLogout={handleLogout} />
       ) : (
         <Login onLogin={handleLogin} />
       )}

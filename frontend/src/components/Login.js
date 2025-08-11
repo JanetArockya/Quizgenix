@@ -3,21 +3,23 @@ import './Login.css';
 
 const Login = ({ onLogin }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    name: '',
     role: 'student'
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
     if (error) setError('');
   };
 
@@ -26,63 +28,67 @@ const Login = ({ onLogin }) => {
     setLoading(true);
     setError('');
 
-    // Validation
-    if (!isLoginMode && formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match!');
-      setLoading(false);
-      return;
-    }
-
-    if (!isLoginMode && formData.password.length < 6) {
-      setError('Password must be at least 6 characters long!');
-      setLoading(false);
-      return;
+    // Form validation
+    if (!isLoginMode) {
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match');
+        setLoading(false);
+        return;
+      }
+      if (formData.name.length < 2) {
+        setError('Name must be at least 2 characters');
+        setLoading(false);
+        return;
+      }
     }
 
     try {
       const endpoint = isLoginMode ? '/api/login' : '/api/register';
-      const payload = {
-        email: formData.email,
-        password: formData.password
-      };
-      
-      if (!isLoginMode) {
-        payload.name = formData.name;
-        payload.role = formData.role;
-      }
+      const payload = isLoginMode 
+        ? {
+            email: formData.email,
+            password: formData.password
+          }
+        : {
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            role: formData.role
+          };
 
-      console.log('🔐 Attempting authentication...', { endpoint, email: payload.email });
+      console.log(`🔐 Attempting ${isLoginMode ? 'login' : 'registration'}...`, {
+        endpoint,
+        email: formData.email
+      });
 
       const response = await fetch(`http://127.0.0.1:5000${endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
       console.log('📡 Server response:', data);
 
       if (response.ok) {
-        console.log('✅ Authentication successful:', data);
-        if (data.user && data.token) {
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          onLogin(data.user);
-        } else {
-          setError('Invalid response from server. Please try again.');
-        }
+        // Store authentication data
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        console.log('✅ Authentication successful:', data.user);
+        console.log('🔑 Token stored:', data.token.substring(0, 20) + '...');
+        
+        // Call the parent component's login handler
+        onLogin(data.user);
       } else {
-        setError(data.error || `Server error: ${response.status}`);
+        setError(data.error || `${isLoginMode ? 'Login' : 'Registration'} failed`);
+        console.error('❌ Authentication failed:', data.error);
       }
     } catch (error) {
-      console.error('🚨 Network error:', error);
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        setError('🔌 Cannot connect to server. Please ensure the backend is running on http://127.0.0.1:5000');
-      } else {
-        setError('Network error. Please check your connection and try again.');
-      }
+      console.error('❌ Network error:', error);
+      setError('Network error. Please ensure the backend server is running on port 5000.');
     }
 
     setLoading(false);
@@ -92,10 +98,10 @@ const Login = ({ onLogin }) => {
     setIsLoginMode(!isLoginMode);
     setError('');
     setFormData({
+      name: '',
       email: '',
       password: '',
       confirmPassword: '',
-      name: '',
       role: 'student'
     });
   };
@@ -125,7 +131,7 @@ const Login = ({ onLogin }) => {
 
         {error && (
           <div className="error-message">
-            {error}
+            ❌ {error}
           </div>
         )}
 
