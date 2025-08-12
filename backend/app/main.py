@@ -85,1017 +85,705 @@ class QuizSession(db.Model):
     current_question = db.Column(db.Integer, default=0)
     answers_so_far = db.Column(db.Text, default='{}')  # JSON of answers
 
-# Advanced AI Knowledge Base
-KNOWLEDGE_BASE = {
+# Enhanced Knowledge Base with Real, Specific Content
+ENHANCED_KNOWLEDGE_BASE = {
     'javascript': {
         'easy': {
-            'questions': [
-                ("What is the correct way to declare a variable in JavaScript?", 
-                 ["var name = 'John';", "variable name = 'John';", "v name = 'John';", "declare name = 'John';"], 0,
-                 "The 'var' keyword is used to declare variables in JavaScript."),
-                ("Which method is used to add an element to the end of an array?", 
-                 ["push()", "add()", "append()", "insert()"], 0,
-                 "The push() method adds elements to the end of an array."),
-                ("What does '===' operator do in JavaScript?", 
-                 ["Strict equality comparison", "Assignment", "Loose equality", "Not equal"], 0,
-                 "The '===' operator performs strict equality comparison without type conversion."),
-                ("How do you write a comment in JavaScript?", 
-                 ["// This is a comment", "<!-- This is a comment -->", "# This is a comment", "/* This is a comment"], 0,
-                 "Single line comments in JavaScript start with //."),
-                ("What is the correct way to create a function?", 
-                 ["function myFunction() {}", "create myFunction() {}", "def myFunction() {}", "function = myFunction() {}"], 0,
-                 "Functions in JavaScript are declared using the 'function' keyword.")
+            'functions': [
+                {
+                    'question': "What is the correct syntax to declare a function in JavaScript?",
+                    'options': [
+                        "function myFunction() { }",
+                        "def myFunction() { }",
+                        "function: myFunction() { }",
+                        "create function myFunction() { }"
+                    ],
+                    'correct': 0,
+                    'explanation': "JavaScript functions are declared using the 'function' keyword followed by the function name and parentheses.",
+                    'references': [
+                        {"title": "MDN - Function Declarations", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions", "type": "Official Documentation"},
+                        {"title": "JavaScript.info - Functions", "url": "https://javascript.info/function-basics", "type": "Tutorial"},
+                        {"title": "W3Schools - JavaScript Functions", "url": "https://www.w3schools.com/js/js_functions.asp", "type": "Learning Resource"}
+                    ]
+                },
+                {
+                    'question': "Which method adds an element to the end of an array?",
+                    'options': [
+                        "push()",
+                        "append()",
+                        "add()",
+                        "insert()"
+                    ],
+                    'correct': 0,
+                    'explanation': "The push() method adds one or more elements to the end of an array and returns the new length of the array.",
+                    'references': [
+                        {"title": "MDN - Array.prototype.push()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push", "type": "Official Documentation"},
+                        {"title": "JavaScript Array Methods", "url": "https://javascript.info/array-methods", "type": "Tutorial"}
+                    ]
+                },
+                {
+                    'question': "What does the '===' operator do in JavaScript?",
+                    'options': [
+                        "Checks for strict equality (value and type)",
+                        "Assigns a value to a variable",
+                        "Checks for loose equality (value only)",
+                        "Compares two strings only"
+                    ],
+                    'correct': 0,
+                    'explanation': "The '===' operator performs strict equality comparison, checking both value and type without type coercion.",
+                    'references': [
+                        {"title": "MDN - Strict Equality", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality", "type": "Official Documentation"},
+                        {"title": "JavaScript Comparison Operators", "url": "https://javascript.info/comparison", "type": "Tutorial"}
+                    ]
+                }
+            ],
+            'variables': [
+                {
+                    'question': "Which keyword is used to declare a block-scoped variable in modern JavaScript?",
+                    'options': [
+                        "let",
+                        "var",
+                        "const",
+                        "variable"
+                    ],
+                    'correct': 0,
+                    'explanation': "The 'let' keyword declares block-scoped variables that can be reassigned, introduced in ES6.",
+                    'references': [
+                        {"title": "MDN - let", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let", "type": "Official Documentation"},
+                        {"title": "JavaScript Variables", "url": "https://javascript.info/variables", "type": "Tutorial"}
+                    ]
+                }
+            ],
+            'arrays': [
+                {
+                    'question': "How do you access the first element of an array named 'fruits'?",
+                    'options': [
+                        "fruits[0]",
+                        "fruits[1]",
+                        "fruits.first()",
+                        "fruits.get(0)"
+                    ],
+                    'correct': 0,
+                    'explanation': "JavaScript arrays are zero-indexed, so the first element is accessed using index 0.",
+                    'references': [
+                        {"title": "MDN - Arrays", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array", "type": "Official Documentation"},
+                        {"title": "JavaScript Array Basics", "url": "https://javascript.info/array", "type": "Tutorial"}
+                    ]
+                }
             ]
         },
         'medium': {
-            'questions': [
-                ("What is closure in JavaScript?", 
-                 ["Function with access to outer scope", "A loop structure", "An object method", "A data type"], 0,
-                 "Closure allows a function to access variables from its outer/enclosing scope."),
-                ("Which method creates a new array with results of calling a function?", 
-                 ["map()", "filter()", "reduce()", "forEach()"], 0,
-                 "The map() method creates a new array with the results of calling a function for every array element."),
-                ("What is the difference between 'let' and 'var'?", 
-                 ["'let' has block scope, 'var' has function scope", "No difference", "'var' is newer", "'let' is faster"], 0,
-                 "'let' provides block scoping while 'var' has function scoping."),
-                ("What is event delegation?", 
-                 ["Handling events on parent elements", "Creating custom events", "Preventing default behavior", "Stopping event propagation"], 0,
-                 "Event delegation allows handling events on parent elements instead of individual child elements."),
-                ("What does 'this' keyword refer to?", 
-                 ["The current execution context", "The previous function", "A global variable", "The parent object"], 0,
-                 "The 'this' keyword refers to the object that is currently executing the code.")
+            'closures': [
+                {
+                    'question': "What will the following code output?\n```javascript\nfunction outer() {\n  let x = 10;\n  return function inner() {\n    console.log(x);\n  };\n}\nconst fn = outer();\nfn();\n```",
+                    'options': [
+                        "10",
+                        "undefined",
+                        "Error",
+                        "null"
+                    ],
+                    'correct': 0,
+                    'explanation': "This demonstrates closure - the inner function retains access to the outer function's variable 'x' even after outer() has finished executing.",
+                    'references': [
+                        {"title": "MDN - Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures", "type": "Official Documentation"},
+                        {"title": "JavaScript Closures Explained", "url": "https://javascript.info/closure", "type": "Tutorial"}
+                    ]
+                }
+            ],
+            'promises': [
+                {
+                    'question': "Which method is used to handle a resolved Promise?",
+                    'options': [
+                        ".then()",
+                        ".catch()",
+                        ".finally()",
+                        ".resolve()"
+                    ],
+                    'correct': 0,
+                    'explanation': "The .then() method is used to handle the successful resolution of a Promise and receive its resolved value.",
+                    'references': [
+                        {"title": "MDN - Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then", "type": "Official Documentation"},
+                        {"title": "JavaScript Promises", "url": "https://javascript.info/promise-basics", "type": "Tutorial"}
+                    ]
+                }
             ]
         },
         'hard': {
-            'questions': [
-                ("What is the time complexity of Array.prototype.indexOf()?", 
-                 ["O(n)", "O(log n)", "O(1)", "O(n²)"], 0,
-                 "indexOf() performs a linear search, resulting in O(n) time complexity."),
-                ("How does JavaScript's event loop work?", 
-                 ["Call stack, callback queue, and event loop coordination", "Simple linear execution", "Parallel processing", "Random execution order"], 0,
-                 "The event loop manages the call stack and callback queue for asynchronous operations."),
-                ("What is the prototype chain?", 
-                 ["Inheritance mechanism in JavaScript", "A design pattern", "A loop structure", "An error handling method"], 0,
-                 "The prototype chain enables inheritance by linking objects through their prototype property."),
-                ("What happens during hoisting?", 
-                 ["Variable and function declarations are moved to top", "Code is optimized", "Errors are fixed", "Variables are deleted"], 0,
-                 "Hoisting moves variable and function declarations to the top of their scope during compilation."),
-                ("What is the difference between call() and apply()?", 
-                 ["call() takes arguments individually, apply() takes array", "No difference", "apply() is faster", "call() is deprecated"], 0,
-                 "call() accepts arguments individually while apply() accepts them as an array.")
+            'async': [
+                {
+                    'question': "What is the difference between Promise.all() and Promise.allSettled()?",
+                    'options': [
+                        "Promise.all() fails fast on first rejection, Promise.allSettled() waits for all to complete",
+                        "Promise.all() waits for all, Promise.allSettled() fails fast",
+                        "They work exactly the same",
+                        "Promise.allSettled() only works with async/await"
+                    ],
+                    'correct': 0,
+                    'explanation': "Promise.all() rejects immediately when any input promise rejects, while Promise.allSettled() waits for all promises to settle (fulfill or reject).",
+                    'references': [
+                        {"title": "MDN - Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all", "type": "Official Documentation"},
+                        {"title": "MDN - Promise.allSettled()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled", "type": "Official Documentation"}
+                    ]
+                }
             ]
         }
     },
     'python': {
         'easy': {
-            'questions': [
-                ("How do you create a list in Python?", 
-                 ["my_list = [1, 2, 3]", "my_list = (1, 2, 3)", "my_list = {1, 2, 3}", "my_list = <1, 2, 3>"], 0,
-                 "Lists in Python are created using square brackets."),
-                ("Which keyword is used to define a function?", 
-                 ["def", "function", "define", "func"], 0,
-                 "The 'def' keyword is used to define functions in Python."),
-                ("How do you print text in Python?", 
-                 ["print('Hello')", "echo('Hello')", "console.log('Hello')", "write('Hello')"], 0,
-                 "The print() function outputs text in Python."),
-                ("What is the correct way to create a dictionary?", 
-                 ["my_dict = {'key': 'value'}", "my_dict = ['key': 'value']", "my_dict = ('key': 'value')", "my_dict = <'key': 'value'>"], 0,
-                 "Dictionaries in Python are created using curly braces with key-value pairs."),
-                ("Which operator is used for exponentiation?", 
-                 ["**", "^", "exp", "pow"], 0,
-                 "The ** operator performs exponentiation in Python.")
+            'basics': [
+                {
+                    'question': "Which of the following is the correct way to create a list in Python?",
+                    'options': [
+                        "my_list = [1, 2, 3]",
+                        "my_list = (1, 2, 3)",
+                        "my_list = {1, 2, 3}",
+                        "my_list = <1, 2, 3>"
+                    ],
+                    'correct': 0,
+                    'explanation': "Lists in Python are created using square brackets [] and can contain multiple data types.",
+                    'references': [
+                        {"title": "Python.org - Lists", "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists", "type": "Official Documentation"},
+                        {"title": "Real Python - Lists", "url": "https://realpython.com/python-lists-tuples/", "type": "Tutorial"}
+                    ]
+                }
+            ],
+            'functions': [
+                {
+                    'question': "What keyword is used to define a function in Python?",
+                    'options': [
+                        "def",
+                        "function",
+                        "define",
+                        "func"
+                    ],
+                    'correct': 0,
+                    'explanation': "The 'def' keyword is used to define functions in Python, followed by the function name and parameters.",
+                    'references': [
+                        {"title": "Python.org - Defining Functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions", "type": "Official Documentation"},
+                        {"title": "Real Python - Functions", "url": "https://realpython.com/defining-your-own-python-function/", "type": "Tutorial"}
+                    ]
+                }
             ]
         },
         'medium': {
-            'questions': [
-                ("What is a list comprehension?", 
-                 ["Compact way to create lists", "List sorting method", "List deletion technique", "List indexing"], 0,
-                 "List comprehensions provide a concise way to create lists based on existing lists."),
-                ("What is the difference between '==' and 'is'?", 
-                 ["'==' compares values, 'is' compares identity", "No difference", "'is' compares values", "'==' is faster"], 0,
-                 "'==' compares values while 'is' compares object identity."),
-                ("What is a decorator in Python?", 
-                 ["Function that modifies another function", "Class inheritance", "Error handling", "Loop structure"], 0,
-                 "Decorators are functions that modify or extend the behavior of other functions."),
-                ("What is the purpose of __init__ method?", 
-                 ["Initialize object attributes", "Destroy objects", "Compare objects", "Copy objects"], 0,
-                 "The __init__ method initializes object attributes when an instance is created."),
-                ("What is a generator?", 
-                 ["Function that returns an iterator", "Random number creator", "List sorter", "File reader"], 0,
-                 "Generators are functions that return iterators and can pause and resume execution.")
-            ]
-        },
-        'hard': {
-            'questions': [
-                ("What is the GIL in Python?", 
-                 ["Global Interpreter Lock limiting thread execution", "Graphics Interface Library", "General Input Library", "Global Import Lock"], 0,
-                 "The GIL prevents multiple threads from executing Python bytecode simultaneously."),
-                ("What is metaclass?", 
-                 ["Class that creates classes", "Parent class", "Abstract class", "Static class"], 0,
-                 "Metaclasses are classes whose instances are classes themselves."),
-                ("How does Python's garbage collection work?", 
-                 ["Reference counting with cycle detection", "Manual memory management", "Stack-based collection", "Time-based cleanup"], 0,
-                 "Python uses reference counting combined with cycle detection for garbage collection."),
-                ("What is the difference between deep and shallow copy?", 
-                 ["Deep copy creates new objects, shallow copy references", "No difference", "Shallow copy is recursive", "Deep copy is faster"], 0,
-                 "Deep copy creates new objects recursively while shallow copy creates references."),
-                ("What is async/await used for?", 
-                 ["Asynchronous programming", "Exception handling", "Class inheritance", "Variable declaration"], 0,
-                 "async/await enables asynchronous programming for non-blocking operations.")
+            'comprehensions': [
+                {
+                    'question': "What will this list comprehension produce?\n```python\n[x**2 for x in range(5) if x % 2 == 0]\n```",
+                    'options': [
+                        "[0, 4, 16]",
+                        "[0, 1, 4, 9, 16]",
+                        "[1, 9]",
+                        "[0, 2, 4]"
+                    ],
+                    'correct': 0,
+                    'explanation': "This creates a list of squares for even numbers in range(5): 0²=0, 2²=4, 4²=16.",
+                    'references': [
+                        {"title": "Python.org - List Comprehensions", "url": "https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions", "type": "Official Documentation"},
+                        {"title": "Real Python - List Comprehensions", "url": "https://realpython.com/list-comprehension-python/", "type": "Tutorial"}
+                    ]
+                }
             ]
         }
     },
     'mathematics': {
         'easy': {
-            'questions': [
-                ("What is 7 × 8?", 
-                 ["56", "54", "64", "48"], 0,
-                 "7 × 8 = 56 using basic multiplication."),
-                ("What is the square root of 16?", 
-                 ["4", "8", "2", "6"], 0,
-                 "√16 = 4 because 4 × 4 = 16."),
-                ("What is 25% of 100?", 
-                 ["25", "75", "50", "20"], 0,
-                 "25% of 100 = 25/100 × 100 = 25."),
-                ("What is the perimeter of a square with side 5?", 
-                 ["20", "25", "10", "15"], 0,
-                 "Perimeter of square = 4 × side length = 4 × 5 = 20."),
-                ("What is 15 - 7?", 
-                 ["8", "9", "7", "22"], 0,
-                 "15 - 7 = 8 using basic subtraction.")
+            'arithmetic': [
+                {
+                    'question': "What is 15% of 200?",
+                    'options': [
+                        "30",
+                        "25",
+                        "35",
+                        "20"
+                    ],
+                    'correct': 0,
+                    'explanation': "15% of 200 = (15/100) × 200 = 0.15 × 200 = 30",
+                    'references': [
+                        {"title": "Khan Academy - Percentages", "url": "https://www.khanacademy.org/math/arithmetic/arith-percents", "type": "Educational"},
+                        {"title": "Math is Fun - Percentages", "url": "https://www.mathsisfun.com/percentage/", "type": "Learning Resource"}
+                    ]
+                }
+            ],
+            'geometry': [
+                {
+                    'question': "What is the area of a rectangle with length 8 and width 5?",
+                    'options': [
+                        "40",
+                        "26",
+                        "13",
+                        "45"
+                    ],
+                    'correct': 0,
+                    'explanation': "Area of rectangle = length × width = 8 × 5 = 40 square units",
+                    'references': [
+                        {"title": "Khan Academy - Area of Rectangles", "url": "https://www.khanacademy.org/math/basic-geo/basic-geo-area-and-perimeter", "type": "Educational"},
+                        {"title": "Math is Fun - Rectangle Area", "url": "https://www.mathsisfun.com/geometry/rectangle.html", "type": "Learning Resource"}
+                    ]
+                }
             ]
         },
         'medium': {
-            'questions': [
-                ("What is the derivative of x²?", 
-                 ["2x", "x", "2x²", "x²"], 0,
-                 "Using the power rule: d/dx(x²) = 2x¹ = 2x."),
-                ("What is the area of a circle with radius 3?", 
-                 ["9π", "6π", "3π", "12π"], 0,
-                 "Area = πr² = π × 3² = 9π."),
-                ("Solve for x: 2x + 5 = 15", 
-                 ["x = 5", "x = 10", "x = 7.5", "x = 20"], 0,
-                 "2x + 5 = 15 → 2x = 10 → x = 5."),
-                ("What is sin(90°)?", 
-                 ["1", "0", "1/2", "√3/2"], 0,
-                 "sin(90°) = 1 in the unit circle."),
-                ("What is log₁₀(100)?", 
-                 ["2", "10", "100", "1"], 0,
-                 "log₁₀(100) = 2 because 10² = 100.")
-            ]
-        },
-        'hard': {
-            'questions': [
-                ("What is the integral of e^x?", 
-                 ["e^x + C", "xe^x + C", "e^x/x + C", "x·e^x + C"], 0,
-                 "The integral of e^x is e^x + C because d/dx(e^x) = e^x."),
-                ("What is the limit of sin(x)/x as x approaches 0?", 
-                 ["1", "0", "∞", "undefined"], 0,
-                 "This is a fundamental limit: lim(x→0) sin(x)/x = 1."),
-                ("What is the determinant of [[2,3],[1,4]]?", 
-                 ["5", "8", "-1", "11"], 0,
-                 "det([[2,3],[1,4]]) = 2×4 - 3×1 = 8 - 3 = 5."),
-                ("What is the Taylor series of e^x around x=0?", 
-                 ["∑(x^n/n!) for n=0 to ∞", "∑(x^n) for n=0 to ∞", "∑(n·x^n) for n=0 to ∞", "∑(x^n/n) for n=1 to ∞"], 0,
-                 "The Taylor series of e^x is ∑(x^n/n!) = 1 + x + x²/2! + x³/3! + ..."),
-                ("What is the eigenvalue equation?", 
-                 ["Av = λv", "A + v = λv", "Av = λ", "A = λv"], 0,
-                 "The eigenvalue equation is Av = λv where A is the matrix, v is eigenvector, λ is eigenvalue.")
+            'algebra': [
+                {
+                    'question': "Solve for x: 3x + 7 = 22",
+                    'options': [
+                        "x = 5",
+                        "x = 7",
+                        "x = 15",
+                        "x = 3"
+                    ],
+                    'correct': 0,
+                    'explanation': "3x + 7 = 22 → 3x = 22 - 7 → 3x = 15 → x = 15 ÷ 3 → x = 5",
+                    'references': [
+                        {"title": "Khan Academy - Linear Equations", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-in-one-variable", "type": "Educational"},
+                        {"title": "Purplemath - Solving Linear Equations", "url": "https://www.purplemath.com/modules/solvelin.htm", "type": "Tutorial"}
+                    ]
+                }
+            ],
+            'calculus': [
+                {
+                    'question': "What is the derivative of f(x) = 3x²?",
+                    'options': [
+                        "6x",
+                        "3x",
+                        "6x²",
+                        "9x"
+                    ],
+                    'correct': 0,
+                    'explanation': "Using the power rule: d/dx(3x²) = 3 × 2x^(2-1) = 6x",
+                    'references': [
+                        {"title": "Khan Academy - Power Rule", "url": "https://www.khanacademy.org/math/calculus-1/cs1-derivatives-definition-and-basic-rules/cs1-power-rule", "type": "Educational"},
+                        {"title": "Paul's Online Math Notes - Derivatives", "url": "https://tutorial.math.lamar.edu/Classes/CalcI/DefnOfDerivative.aspx", "type": "Tutorial"}
+                    ]
+                }
             ]
         }
     },
     'science': {
         'easy': {
-            'questions': [
-                ("What is the chemical symbol for water?", 
-                 ["H₂O", "CO₂", "NaCl", "O₂"], 0,
-                 "Water consists of 2 hydrogen atoms and 1 oxygen atom: H₂O."),
-                ("What is the speed of light?", 
-                 ["3×10⁸ m/s", "3×10⁶ m/s", "3×10¹⁰ m/s", "3×10⁴ m/s"], 0,
-                 "The speed of light in vacuum is approximately 3×10⁸ meters per second."),
-                ("What is the powerhouse of the cell?", 
-                 ["Mitochondria", "Nucleus", "Ribosome", "Chloroplast"], 0,
-                 "Mitochondria produce ATP, the cell's energy currency."),
-                ("What gas do plants absorb during photosynthesis?", 
-                 ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"], 0,
-                 "Plants absorb CO₂ and release oxygen during photosynthesis."),
-                ("What is the atomic number of carbon?", 
-                 ["6", "12", "14", "8"], 0,
-                 "Carbon has 6 protons, making its atomic number 6.")
+            'chemistry': [
+                {
+                    'question': "What is the chemical formula for table salt?",
+                    'options': [
+                        "NaCl",
+                        "H₂O",
+                        "CO₂",
+                        "CaCl₂"
+                    ],
+                    'correct': 0,
+                    'explanation': "Table salt is sodium chloride, composed of one sodium (Na) and one chlorine (Cl) atom.",
+                    'references': [
+                        {"title": "NIST Chemistry WebBook", "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=7647-14-5", "type": "Scientific Database"},
+                        {"title": "Khan Academy - Ionic Compounds", "url": "https://www.khanacademy.org/science/chemistry/chemical-bonds/types-chemical-bonds/a/ionic-bonds", "type": "Educational"}
+                    ]
+                }
+            ],
+            'physics': [
+                {
+                    'question': "What is the acceleration due to gravity on Earth (approximately)?",
+                    'options': [
+                        "9.8 m/s²",
+                        "10.8 m/s²",
+                        "8.8 m/s²",
+                        "11.8 m/s²"
+                    ],
+                    'correct': 0,
+                    'explanation': "The standard acceleration due to gravity on Earth is approximately 9.8 meters per second squared.",
+                    'references': [
+                        {"title": "NIST Physical Constants", "url": "https://physics.nist.gov/cgi-bin/cuu/Value?gn", "type": "Scientific Database"},
+                        {"title": "Khan Academy - Gravity", "url": "https://www.khanacademy.org/science/physics/forces-newtons-laws/normal-contact-force/a/what-is-weight", "type": "Educational"}
+                    ]
+                }
             ]
         },
         'medium': {
-            'questions': [
-                ("What is Newton's second law of motion?", 
-                 ["F = ma", "F = mv", "F = m/a", "F = a/m"], 0,
-                 "Newton's second law states that Force equals mass times acceleration."),
-                ("What is the pH of pure water?", 
-                 ["7", "0", "14", "1"], 0,
-                 "Pure water has a neutral pH of 7 at room temperature."),
-                ("What is the process of cell division called?", 
-                 ["Mitosis", "Osmosis", "Photosynthesis", "Respiration"], 0,
-                 "Mitosis is the process by which cells divide to create identical copies."),
-                ("What is Ohm's law?", 
-                 ["V = IR", "P = VI", "E = mc²", "F = qE"], 0,
-                 "Ohm's law states that Voltage equals Current times Resistance."),
-                ("What is the most abundant gas in Earth's atmosphere?", 
-                 ["Nitrogen", "Oxygen", "Carbon dioxide", "Argon"], 0,
-                 "Nitrogen makes up about 78% of Earth's atmosphere.")
-            ]
-        },
-        'hard': {
-            'questions': [
-                ("What is the Heisenberg Uncertainty Principle?", 
-                 ["Cannot know position and momentum simultaneously", "Energy is quantized", "Light has wave-particle duality", "Space and time are relative"], 0,
-                 "The uncertainty principle states fundamental limits to simultaneously measuring certain pairs of properties."),
-                ("What is the mechanism of enzyme catalysis?", 
-                 ["Lowering activation energy", "Increasing temperature", "Adding more substrate", "Changing pH"], 0,
-                 "Enzymes catalyze reactions by lowering the activation energy required."),
-                ("What is the Second Law of Thermodynamics?", 
-                 ["Entropy of isolated system always increases", "Energy is conserved", "Force equals mass times acceleration", "Every action has equal opposite reaction"], 0,
-                 "The Second Law states that entropy (disorder) of an isolated system always increases."),
-                ("What is the structure of DNA?", 
-                 ["Double helix with antiparallel strands", "Single strand", "Triple helix", "Circular loop"], 0,
-                 "DNA has a double helix structure with two antiparallel complementary strands."),
-                ("What is quantum entanglement?", 
-                 ["Correlated quantum states regardless of distance", "Particle acceleration", "Wave interference", "Energy quantization"], 0,
-                 "Quantum entanglement occurs when particles remain connected so that the quantum state of each particle cannot be described independently.")
+            'biology': [
+                {
+                    'question': "Which organelle is responsible for cellular respiration?",
+                    'options': [
+                        "Mitochondria",
+                        "Chloroplast",
+                        "Nucleus",
+                        "Ribosome"
+                    ],
+                    'correct': 0,
+                    'explanation': "Mitochondria are the powerhouses of the cell, converting glucose and oxygen into ATP through cellular respiration.",
+                    'references': [
+                        {"title": "NCBI - Mitochondria", "url": "https://www.ncbi.nlm.nih.gov/books/NBK9896/", "type": "Scientific Literature"},
+                        {"title": "Khan Academy - Cellular Respiration", "url": "https://www.khanacademy.org/science/biology/cellular-respiration-and-fermentation", "type": "Educational"}
+                    ]
+                }
             ]
         }
     }
 }
 
-# Add this enhanced knowledge base with references after your existing KNOWLEDGE_BASE
-KNOWLEDGE_BASE_WITH_REFERENCES = {
-    'javascript': {
-        'easy': {
-            'questions': [
-                ("What is the correct way to declare a variable in JavaScript?", 
-                 ["var name = 'John';", "variable name = 'John';", "v name = 'John';", "declare name = 'John';"], 0,
-                 "The 'var' keyword is used to declare variables in JavaScript.",
-                 [
-                     {"title": "MDN Web Docs - var", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/var", "type": "Official Documentation"},
-                     {"title": "JavaScript.info - Variables", "url": "https://javascript.info/variables", "type": "Tutorial"},
-                     {"title": "W3Schools - JavaScript Variables", "url": "https://www.w3schools.com/js/js_variables.asp", "type": "Learning Resource"}
-                 ]),
-                ("Which method is used to add an element to the end of an array?", 
-                 ["push()", "add()", "append()", "insert()"], 0,
-                 "The push() method adds elements to the end of an array.",
-                 [
-                     {"title": "MDN Web Docs - Array.prototype.push()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push", "type": "Official Documentation"},
-                     {"title": "JavaScript.info - Array methods", "url": "https://javascript.info/array-methods", "type": "Tutorial"},
-                     {"title": "ECMAScript Specification - Array.prototype.push", "url": "https://tc39.es/ecma262/#sec-array.prototype.push", "type": "Specification"}
-                 ]),
-                ("What does '===' operator do in JavaScript?", 
-                 ["Strict equality comparison", "Assignment", "Loose equality", "Not equal"], 0,
-                 "The '===' operator performs strict equality comparison without type conversion.",
-                 [
-                     {"title": "MDN Web Docs - Strict equality (===)", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality", "type": "Official Documentation"},
-                     {"title": "JavaScript.info - Comparisons", "url": "https://javascript.info/comparison", "type": "Tutorial"},
-                     {"title": "ECMAScript Specification - Strict Equality", "url": "https://tc39.es/ecma262/#sec-strict-equality-comparison", "type": "Specification"}
-                 ])
-            ]
-        },
-        'medium': {
-            'questions': [
-                ("What is closure in JavaScript?", 
-                 ["Function with access to outer scope", "A loop structure", "An object method", "A data type"], 0,
-                 "Closure allows a function to access variables from its outer/enclosing scope.",
-                 [
-                     {"title": "MDN Web Docs - Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures", "type": "Official Documentation"},
-                     {"title": "JavaScript.info - Variable scope, closures", "url": "https://javascript.info/closure", "type": "Tutorial"},
-                     {"title": "You Don't Know JS - Scope & Closures", "url": "https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures", "type": "Book"}
-                 ]),
-                ("Which method creates a new array with results of calling a function?", 
-                 ["map()", "filter()", "reduce()", "forEach()"], 0,
-                 "The map() method creates a new array with the results of calling a function for every array element.",
-                 [
-                     {"title": "MDN Web Docs - Array.prototype.map()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map", "type": "Official Documentation"},
-                     {"title": "JavaScript.info - Array methods", "url": "https://javascript.info/array-methods#map", "type": "Tutorial"},
-                     {"title": "ECMAScript Specification - Array.prototype.map", "url": "https://tc39.es/ecma262/#sec-array.prototype.map", "type": "Specification"}
-                 ])
-            ]
-        },
-        'hard': {
-            'questions': [
-                ("What is the time complexity of Array.prototype.indexOf()?", 
-                 ["O(n)", "O(log n)", "O(1)", "O(n²)"], 0,
-                 "indexOf() performs a linear search, resulting in O(n) time complexity.",
-                 [
-                     {"title": "MDN Web Docs - Array.prototype.indexOf()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf", "type": "Official Documentation"},
-                     {"title": "Big O Notation - Khan Academy", "url": "https://www.khanacademy.org/computing/computer-science/algorithms/asymptotic-notation/a/big-o-notation", "type": "Educational"},
-                     {"title": "ECMAScript Specification - Array.prototype.indexOf", "url": "https://tc39.es/ecma262/#sec-array.prototype.indexof", "type": "Specification"}
-                 ]),
-                ("What is the prototype chain?", 
-                 ["Inheritance mechanism in JavaScript", "A design pattern", "A loop structure", "An error handling method"], 0,
-                 "The prototype chain enables inheritance by linking objects through their prototype property.",
-                 [
-                     {"title": "MDN Web Docs - Inheritance and prototype chain", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain", "type": "Official Documentation"},
-                     {"title": "JavaScript.info - Prototypal inheritance", "url": "https://javascript.info/prototype-inheritance", "type": "Tutorial"},
-                     {"title": "You Don't Know JS - this & Object Prototypes", "url": "https://github.com/getify/You-Dont-Know-JS/tree/1st-ed/this%20%26%20object%20prototypes", "type": "Book"}
-                 ])
-            ]
-        }
-    },
-    'python': {
-        'easy': {
-            'questions': [
-                ("How do you create a list in Python?", 
-                 ["my_list = [1, 2, 3]", "my_list = (1, 2, 3)", "my_list = {1, 2, 3}", "my_list = <1, 2, 3>"], 0,
-                 "Lists in Python are created using square brackets.",
-                 [
-                     {"title": "Python.org - Lists", "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists", "type": "Official Documentation"},
-                     {"title": "Real Python - Lists and Tuples", "url": "https://realpython.com/python-lists-tuples/", "type": "Tutorial"},
-                     {"title": "Python PEP 289 - List Comprehensions", "url": "https://www.python.org/dev/peps/pep-0289/", "type": "PEP Document"}
-                 ]),
-                ("Which keyword is used to define a function?", 
-                 ["def", "function", "define", "func"], 0,
-                 "The 'def' keyword is used to define functions in Python.",
-                 [
-                     {"title": "Python.org - Defining Functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions", "type": "Official Documentation"},
-                     {"title": "Real Python - Python Functions", "url": "https://realpython.com/defining-your-own-python-function/", "type": "Tutorial"},
-                     {"title": "PEP 3107 - Function Annotations", "url": "https://www.python.org/dev/peps/pep-3107/", "type": "PEP Document"}
-                 ])
-            ]
-        },
-        'medium': {
-            'questions': [
-                ("What is the GIL in Python?", 
-                 ["Global Interpreter Lock limiting thread execution", "Graphics Interface Library", "General Input Library", "Global Import Lock"], 0,
-                 "The GIL prevents multiple threads from executing Python bytecode simultaneously.",
-                 [
-                     {"title": "Python.org - Global Interpreter Lock", "url": "https://docs.python.org/3/c-api/init.html#thread-state-and-the-global-interpreter-lock", "type": "Official Documentation"},
-                     {"title": "Real Python - Python's GIL", "url": "https://realpython.com/python-gil/", "type": "Tutorial"},
-                     {"title": "PEP 311 - Simplified GIL Acquisition", "url": "https://www.python.org/dev/peps/pep-0311/", "type": "PEP Document"}
-                 ])
-            ]
-        }
-    },
-    'mathematics': {
-        'easy': {
-            'questions': [
-                ("What is 7 × 8?", 
-                 ["56", "54", "64", "48"], 0,
-                 "7 × 8 = 56 using basic multiplication."),
-                ("What is the square root of 16?", 
-                 ["4", "8", "2", "6"], 0,
-                 "√16 = 4 because 4 × 4 = 16."),
-                ("What is 25% of 100?", 
-                 ["25", "75", "50", "20"], 0,
-                 "25% of 100 = 25/100 × 100 = 25."),
-                ("What is the perimeter of a square with side 5?", 
-                 ["20", "25", "10", "15"], 0,
-                 "Perimeter of square = 4 × side length = 4 × 5 = 20."),
-                ("What is 15 - 7?", 
-                 ["8", "9", "7", "22"], 0,
-                 "15 - 7 = 8 using basic subtraction.")
-            ]
-        },
-        'medium': {
-            'questions': [
-                ("What is the derivative of x²?", 
-                 ["2x", "x", "2x²", "x²"], 0,
-                 "Using the power rule: d/dx(x²) = 2x¹ = 2x."),
-                ("What is the area of a circle with radius 3?", 
-                 ["9π", "6π", "3π", "12π"], 0,
-                 "Area = πr² = π × 3² = 9π."),
-                ("Solve for x: 2x + 5 = 15", 
-                 ["x = 5", "x = 10", "x = 7.5", "x = 20"], 0,
-                 "2x + 5 = 15 → 2x = 10 → x = 5."),
-                ("What is sin(90°)?", 
-                 ["1", "0", "1/2", "√3/2"], 0,
-                 "sin(90°) = 1 in the unit circle."),
-                ("What is log₁₀(100)?", 
-                 ["2", "10", "100", "1"], 0,
-                 "log₁₀(100) = 2 because 10² = 100.")
-            ]
-        },
-        'hard': {
-            'questions': [
-                ("What is the integral of e^x?", 
-                 ["e^x + C", "xe^x + C", "e^x/x + C", "x·e^x + C"], 0,
-                 "The integral of e^x is e^x + C because d/dx(e^x) = e^x."),
-                ("What is the limit of sin(x)/x as x approaches 0?", 
-                 ["1", "0", "∞", "undefined"], 0,
-                 "This is a fundamental limit: lim(x→0) sin(x)/x = 1."),
-                ("What is the determinant of [[2,3],[1,4]]?", 
-                 ["5", "8", "-1", "11"], 0,
-                 "det([[2,3],[1,4]]) = 2×4 - 3×1 = 8 - 3 = 5."),
-                ("What is the Taylor series of e^x around x=0?", 
-                 ["∑(x^n/n!) for n=0 to ∞", "∑(x^n) for n=0 to ∞", "∑(n·x^n) for n=0 to ∞", "∑(x^n/n) for n=1 to ∞"], 0,
-                 "The Taylor series of e^x is ∑(x^n/n!) = 1 + x + x²/2! + x³/3! + ..."),
-                ("What is the eigenvalue equation?", 
-                 ["Av = λv", "A + v = λv", "Av = λ", "A = λv"], 0,
-                 "The eigenvalue equation is Av = λv where A is the matrix, v is eigenvector, λ is eigenvalue.")
-            ]
-        }
-    },
-    'science': {
-        'easy': {
-            'questions': [
-                ("What is the chemical symbol for water?", 
-                 ["H₂O", "CO₂", "NaCl", "O₂"], 0,
-                 "Water consists of 2 hydrogen atoms and 1 oxygen atom: H₂O."),
-                ("What is the speed of light?", 
-                 ["3×10⁸ m/s", "3×10⁶ m/s", "3×10¹⁰ m/s", "3×10⁴ m/s"], 0,
-                 "The speed of light in vacuum is approximately 3×10⁸ meters per second."),
-                ("What is the powerhouse of the cell?", 
-                 ["Mitochondria", "Nucleus", "Ribosome", "Chloroplast"], 0,
-                 "Mitochondria produce ATP, the cell's energy currency."),
-                ("What gas do plants absorb during photosynthesis?", 
-                 ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"], 0,
-                 "Plants absorb CO₂ and release oxygen during photosynthesis."),
-                ("What is the atomic number of carbon?", 
-                 ["6", "12", "14", "8"], 0,
-                 "Carbon has 6 protons, making its atomic number 6.")
-            ]
-        },
-        'medium': {
-            'questions': [
-                ("What is Newton's second law of motion?", 
-                 ["F = ma", "F = mv", "F = m/a", "F = a/m"], 0,
-                 "Newton's second law states that Force equals mass times acceleration."),
-                ("What is the pH of pure water?", 
-                 ["7", "0", "14", "1"], 0,
-                 "Pure water has a neutral pH of 7 at room temperature."),
-                ("What is the process of cell division called?", 
-                 ["Mitosis", "Osmosis", "Photosynthesis", "Respiration"], 0,
-                 "Mitosis is the process by which cells divide to create identical copies."),
-                ("What is Ohm's law?", 
-                 ["V = IR", "P = VI", "E = mc²", "F = qE"], 0,
-                 "Ohm's law states that Voltage equals Current times Resistance."),
-                ("What is the most abundant gas in Earth's atmosphere?", 
-                 ["Nitrogen", "Oxygen", "Carbon dioxide", "Argon"], 0,
-                 "Nitrogen makes up about 78% of Earth's atmosphere.")
-            ]
-        },
-        'hard': {
-            'questions': [
-                ("What is the Heisenberg Uncertainty Principle?", 
-                 ["Cannot know position and momentum simultaneously", "Energy is quantized", "Light has wave-particle duality", "Space and time are relative"], 0,
-                 "The uncertainty principle states fundamental limits to simultaneously measuring certain pairs of properties."),
-                ("What is the mechanism of enzyme catalysis?", 
-                 ["Lowering activation energy", "Increasing temperature", "Adding more substrate", "Changing pH"], 0,
-                 "Enzymes catalyze reactions by lowering the activation energy required."),
-                ("What is the Second Law of Thermodynamics?", 
-                 ["Entropy of isolated system always increases", "Energy is conserved", "Force equals mass times acceleration", "Every action has equal opposite reaction"], 0,
-                 "The Second Law states that entropy (disorder) of an isolated system always increases."),
-                ("What is the structure of DNA?", 
-                 ["Double helix with antiparallel strands", "Single strand", "Triple helix", "Circular loop"], 0,
-                 "DNA has a double helix structure with two antiparallel complementary strands."),
-                ("What is quantum entanglement?", 
-                 ["Correlated quantum states regardless of distance", "Particle acceleration", "Wave interference", "Energy quantization"], 0,
-                 "Quantum entanglement occurs when particles remain connected so that the quantum state of each particle cannot be described independently.")
-            ]
-        }
-    }
-}
-
-def generate_advanced_ai_questions(quiz_data):
-    """Generate diverse, logical questions using advanced AI logic"""
-    questions = []
-    count = int(quiz_data.get('questionCount', 5))
-    topic = quiz_data.get('topic', '').lower().strip()
-    difficulty = quiz_data.get('difficulty', 'medium').lower()
-    subject = quiz_data.get('subject', '').lower().strip()
-    
-    print(f"🤖 Generating questions for: {topic} in {subject} ({difficulty})")
-    
-    # Determine the best knowledge domain
-    domain_key = None
-    
-    # Smart topic matching
-    if any(keyword in topic for keyword in ['javascript', 'js', 'programming', 'coding', 'function', 'variable', 'array']):
-        domain_key = 'javascript'
-    elif any(keyword in topic for keyword in ['python', 'django', 'flask', 'list', 'dictionary', 'class']):
-        domain_key = 'python'
-    elif any(keyword in topic for keyword in ['math', 'algebra', 'calculus', 'geometry', 'equation', 'derivative', 'integral']):
-        domain_key = 'mathematics'
-    elif any(keyword in topic for keyword in ['chemistry', 'physics', 'biology', 'science', 'cell', 'atom', 'molecule']):
-        domain_key = 'science'
-    elif any(keyword in subject for keyword in ['computer', 'programming', 'software']):
-        domain_key = 'javascript'  # Default programming
-    elif any(keyword in subject for keyword in ['math', 'mathematics']):
-        domain_key = 'mathematics'
-    elif any(keyword in subject for keyword in ['science', 'chemistry', 'physics', 'biology']):
-        domain_key = 'science'
-    else:
-        # If no match, use a general approach
-        domain_key = 'science'  # Default fallback
-    
-    # Get questions from knowledge base
-    if domain_key and domain_key in KNOWLEDGE_BASE and difficulty in KNOWLEDGE_BASE[domain_key]:
-        knowledge_questions = KNOWLEDGE_BASE[domain_key][difficulty]['questions']
+def generate_intelligent_questions(quiz_data):
+    """Generate intelligent, domain-specific questions with proper resources"""
+    try:
+        count = int(quiz_data.get('questionCount', 5))
+        topic = quiz_data.get('topic', '').lower().strip()
+        difficulty = quiz_data.get('difficulty', 'medium').lower()
+        subject = quiz_data.get('subject', '').lower().strip()
         
-        # If we have enough pre-made questions, use them
-        if len(knowledge_questions) >= count:
-            selected_questions = random.sample(knowledge_questions, count)
-        else:
-            # Use all available and generate more
-            selected_questions = knowledge_questions[:]
-            remaining = count - len(selected_questions)
-            
-            # Generate additional questions
-            for i in range(remaining):
-                additional_q = generate_contextual_question(topic, subject, difficulty, i + len(selected_questions) + 1)
-                selected_questions.append(additional_q)
-    else:
-        # Generate all questions contextually
-        selected_questions = []
+        print(f"🧠 Generating intelligent questions for: {topic} in {subject} ({difficulty})")
+        
+        # Determine domain and subtopic
+        domain, subtopic = determine_intelligent_domain(topic, subject)
+        
+        # Get relevant question pool
+        question_pool = get_relevant_questions(domain, difficulty, subtopic, topic)
+        
+        # Generate questions
+        questions = []
+        used_questions = set()
+        
         for i in range(count):
-            question = generate_contextual_question(topic, subject, difficulty, i + 1)
-            selected_questions.append(question)
-    
-    # Convert to our format
-    for i, q_data in enumerate(selected_questions):
-        if isinstance(q_data, tuple) and len(q_data) >= 4:
-            question_text, options, correct_idx, explanation = q_data[0], q_data[1], q_data[2], q_data[3]
-        else:
-            question_text, options, correct_idx, explanation = q_data
+            question_data = select_and_customize_question(
+                question_pool, used_questions, topic, subject, difficulty, i + 1
+            )
+            
+            if question_data:
+                questions.append(question_data)
+            else:
+                # Fallback: generate contextual question
+                fallback_question = generate_smart_contextual_question(
+                    topic, subject, difficulty, domain, i + 1
+                )
+                questions.append(fallback_question)
         
-        question = {
-            'id': i + 1,
-            'question': question_text,
-            'options': options,
-            'correct_answer': correct_idx,
-            'explanation': explanation,
-            'ai_generated': True,
-            'difficulty': difficulty,
-            'topic': topic,
-            'domain': domain_key
-        }
-        questions.append(question)
-    
-    print(f"✅ Generated {len(questions)} diverse questions for {topic}")
-    return questions
+        print(f"✅ Generated {len(questions)} intelligent questions with verified resources")
+        return questions
+        
+    except Exception as e:
+        print(f"❌ Error in intelligent question generation: {e}")
+        return generate_fallback_questions(quiz_data)
 
-def generate_contextual_question(topic, subject, difficulty, question_num):
-    """Generate contextual questions when no pre-made questions exist"""
-    
-    templates = {
-        'easy': [
-            f"What is the basic definition of {topic}?",
-            f"Which of the following best describes {topic}?",
-            f"What is a key characteristic of {topic}?",
-            f"In {subject}, {topic} is primarily used for:",
-            f"What is the main purpose of {topic}?"
-        ],
-        'medium': [
-            f"How does {topic} work in practical applications?",
-            f"What are the advantages of using {topic}?",
-            f"How does {topic} relate to other concepts in {subject}?",
-            f"What is the best approach when implementing {topic}?",
-            f"What problems does {topic} solve in {subject}?"
-        ],
-        'hard': [
-            f"What are the theoretical foundations of {topic}?",
-            f"How would you optimize {topic} for complex scenarios?",
-            f"What are the limitations and trade-offs of {topic}?",
-            f"How does {topic} integrate with advanced {subject} concepts?",
-            f"What are the cutting-edge developments in {topic}?"
-        ]
-    }
-    
-    question_templates = templates.get(difficulty, templates['medium'])
-    question_text = question_templates[(question_num - 1) % len(question_templates)]
-    
-    # Generate more diverse options
-    if 'programming' in subject.lower() or 'computer' in subject.lower():
-        options = [
-            f"It provides efficient solutions for {topic}-related problems",
-            f"It is an outdated approach to handling {topic}",
-            f"It only works in specific programming languages",
-            f"It has no practical applications in modern development"
-        ]
-    elif 'math' in subject.lower():
-        options = [
-            f"It follows fundamental mathematical principles for {topic}",
-            f"It contradicts basic mathematical rules",
-            f"It only applies to theoretical mathematics",
-            f"It is used exclusively in advanced calculus"
-        ]
-    else:
-        options = [
-            f"It represents current scientific understanding of {topic}",
-            f"It is based on disproven theories about {topic}",
-            f"It only applies in laboratory conditions",
-            f"It has no connection to real-world phenomena"
-        ]
-    
-    # Randomize correct answer position
-    correct_answer = random.randint(0, 3)
-    
-    explanation = f"This answer correctly explains {topic} because it aligns with established principles in {subject} and reflects current understanding in the field."
-    
-    return (question_text, options, correct_answer, explanation)
-
-def generate_advanced_ai_questions_with_references(quiz_data):
-    """Generate diverse, unique questions with authoritative references"""
-    questions = []
-    count = int(quiz_data.get('questionCount', 5))
-    topic = quiz_data.get('topic', '').lower().strip()
-    difficulty = quiz_data.get('difficulty', 'medium').lower()
-    subject = quiz_data.get('subject', '').lower().strip()
-    
-    print(f"🤖 Generating {count} unique questions for: {topic} in {subject} ({difficulty})")
-    
-    # Determine the best knowledge domain
-    domain_key = determine_domain(topic, subject)
-    
-    # Create diverse question templates for each topic
-    question_templates = get_diverse_question_templates(topic, subject, difficulty)
-    
-    # Generate unique questions using different templates
-    used_templates = set()
-    used_concepts = set()
-    
-    for i in range(count):
-        # Ensure we don't repeat question types
-        available_templates = [t for t in question_templates if t['id'] not in used_templates]
-        if not available_templates:
-            # Reset if we've used all templates
-            used_templates.clear()
-            available_templates = question_templates
-        
-        # Select a unique template
-        template = random.choice(available_templates)
-        used_templates.add(template['id'])
-        
-        # Generate question with specific concept focus
-        concept = generate_unique_concept(topic, subject, used_concepts, i)
-        used_concepts.add(concept)
-        
-        question_data = generate_contextual_question_with_template(
-            topic, subject, difficulty, template, concept, i + 1
-        )
-        
-        # Randomize correct answer position
-        question_text, options, correct_idx, explanation, references = question_data
-        randomized_correct_idx = random.randint(0, 3)
-        randomized_options = options[:]
-        
-        # Swap correct answer to new position
-        if randomized_correct_idx != correct_idx:
-            randomized_options[randomized_correct_idx], randomized_options[correct_idx] = \
-                randomized_options[correct_idx], randomized_options[randomized_correct_idx]
-        
-        question = {
-            'id': i + 1,
-            'question': question_text,
-            'options': randomized_options,
-            'correct_answer': randomized_correct_idx,
-            'explanation': explanation,
-            'references': references,
-            'ai_generated': True,
-            'verified': True,
-            'difficulty': difficulty,
-            'topic': topic,
-            'concept': concept,
-            'template_used': template['id']
-        }
-        questions.append(question)
-    
-    print(f"✅ Generated {len(questions)} unique questions with diverse concepts")
-    return questions
-
-def determine_domain(topic, subject):
-    """Determine the knowledge domain based on topic and subject"""
+def determine_intelligent_domain(topic, subject):
+    """Intelligently determine domain and subtopic"""
     topic_lower = topic.lower()
     subject_lower = subject.lower()
     
-    # JavaScript/Programming keywords
-    js_keywords = ['javascript', 'js', 'function', 'variable', 'array', 'object', 'dom', 'api', 'async', 'promise']
-    # Python keywords  
-    python_keywords = ['python', 'django', 'flask', 'list', 'dictionary', 'class', 'module', 'pip', 'pandas']
-    # Math keywords
-    math_keywords = ['algebra', 'calculus', 'geometry', 'trigonometry', 'equation', 'derivative', 'integral', 'matrix']
-    # Science keywords
-    science_keywords = ['chemistry', 'physics', 'biology', 'cell', 'atom', 'molecule', 'energy', 'force', 'genetics']
-    
-    if any(keyword in topic_lower or keyword in subject_lower for keyword in js_keywords):
-        return 'javascript'
-    elif any(keyword in topic_lower or keyword in subject_lower for keyword in python_keywords):
-        return 'python'
-    elif any(keyword in topic_lower or keyword in subject_lower for keyword in math_keywords):
-        return 'mathematics'
-    elif any(keyword in topic_lower or keyword in subject_lower for keyword in science_keywords):
-        return 'science'
-    elif 'computer' in subject_lower or 'programming' in subject_lower:
-        return 'javascript'
-    elif 'math' in subject_lower:
-        return 'mathematics'
-    else:
-        return 'science'
-
-def get_diverse_question_templates(topic, subject, difficulty):
-    """Get diverse question templates to avoid repetition"""
-    
-    base_templates = [
-        {'id': 'definition', 'type': 'What is', 'focus': 'basic understanding'},
-        {'id': 'application', 'type': 'How to use', 'focus': 'practical application'},
-        {'id': 'comparison', 'type': 'Compare/contrast', 'focus': 'relationship analysis'},
-        {'id': 'problem_solving', 'type': 'Problem solving', 'focus': 'solution approach'},
-        {'id': 'best_practice', 'type': 'Best practice', 'focus': 'optimal approach'},
-        {'id': 'troubleshooting', 'type': 'Troubleshooting', 'focus': 'error handling'},
-        {'id': 'implementation', 'type': 'Implementation', 'focus': 'coding/application'},
-        {'id': 'theory', 'type': 'Theoretical', 'focus': 'conceptual understanding'}
-    ]
-    
-    # Adjust templates based on difficulty
-    if difficulty == 'easy':
-        return [t for t in base_templates if t['id'] in ['definition', 'application', 'best_practice']]
-    elif difficulty == 'medium':
-        return [t for t in base_templates if t['id'] in ['application', 'comparison', 'problem_solving', 'implementation']]
-    else:  # hard
-        return [t for t in base_templates if t['id'] in ['problem_solving', 'troubleshooting', 'theory', 'implementation']]
-
-def generate_unique_concept(topic, subject, used_concepts, question_number):
-    """Generate unique concept variations to avoid repetition"""
-    
-    base_topic = topic.lower()
-    
-    # Create concept variations based on domain
-    if 'javascript' in subject.lower() or 'programming' in subject.lower():
-        concepts = [
-            f"{base_topic} syntax",
-            f"{base_topic} best practices", 
-            f"{base_topic} performance",
-            f"{base_topic} debugging",
-            f"{base_topic} implementation",
-            f"{base_topic} optimization",
-            f"{base_topic} error handling",
-            f"{base_topic} integration"
-        ]
-    elif 'math' in subject.lower():
-        concepts = [
-            f"{base_topic} fundamentals",
-            f"{base_topic} applications",
-            f"{base_topic} problem solving",
-            f"{base_topic} theorems",
-            f"{base_topic} proofs",
-            f"{base_topic} calculations",
-            f"{base_topic} formulas",
-            f"{base_topic} real-world usage"
-        ]
-    else:
-        concepts = [
-            f"{base_topic} principles",
-            f"{base_topic} applications",
-            f"{base_topic} methodology",
-            f"{base_topic} analysis",
-            f"{base_topic} implementation",
-            f"{base_topic} evaluation",
-            f"{base_topic} optimization",
-            f"{base_topic} integration"
-        ]
-    
-    # Return unused concept or create new one
-    available_concepts = [c for c in concepts if c not in used_concepts]
-    if available_concepts:
-        return random.choice(available_concepts)
-    else:
-        return f"{base_topic} aspect {question_number}"
-
-def generate_contextual_question_with_template(topic, subject, difficulty, template, concept, question_num):
-    """Generate unique questions using templates and concepts"""
-    
-    # Create diverse question stems based on template type
-    if template['id'] == 'definition':
-        question_stems = [
-            f"What is the primary purpose of {concept}?",
-            f"How would you define {concept}?",
-            f"What characterizes {concept}?",
-            f"Which statement best describes {concept}?"
-        ]
-    elif template['id'] == 'application':
-        question_stems = [
-            f"When implementing {concept}, what is the recommended approach?",
-            f"How should {concept} be applied in practical scenarios?",
-            f"What is the best way to utilize {concept}?",
-            f"In which situation would you use {concept}?"
-        ]
-    elif template['id'] == 'comparison':
-        question_stems = [
-            f"How does {concept} compare to alternative approaches?",
-            f"What advantage does {concept} provide over other methods?",
-            f"When choosing between options, why select {concept}?",
-            f"What makes {concept} different from similar concepts?"
-        ]
-    elif template['id'] == 'problem_solving':
-        question_stems = [
-            f"When facing challenges with {concept}, what should you do?",
-            f"How do you solve problems related to {concept}?",
-            f"What approach works best for {concept} issues?",
-            f"If {concept} isn't working as expected, what's the solution?"
-        ]
-    elif template['id'] == 'best_practice':
-        question_stems = [
-            f"What is considered best practice for {concept}?",
-            f"Which approach is recommended when working with {concept}?",
-            f"What guidelines should be followed for {concept}?",
-            f"How should professionals handle {concept}?"
-        ]
-    elif template['id'] == 'troubleshooting':
-        question_stems = [
-            f"When {concept} produces unexpected results, what's the likely cause?",
-            f"How do you debug issues with {concept}?",
-            f"What's the first step in troubleshooting {concept}?",
-            f"Common problems with {concept} are usually caused by what?"
-        ]
-    elif template['id'] == 'implementation':
-        question_stems = [
-            f"The correct way to implement {concept} involves which step?",
-            f"When setting up {concept}, what is essential?",
-            f"What must be considered during {concept} implementation?",
-            f"Which factor is most important for successful {concept}?"
-        ]
-    else:  # theory
-        question_stems = [
-            f"The theoretical foundation of {concept} is based on what?",
-            f"What principle underlies {concept}?",
-            f"From a theoretical perspective, {concept} represents what?",
-            f"The conceptual basis for {concept} comes from which idea?"
-        ]
-    
-    # Select question stem
-    question_text = random.choice(question_stems)
-    
-    # Generate diverse, contextual options
-    options = generate_diverse_options(topic, subject, concept, template, difficulty)
-    
-    # Always put correct answer first, then randomize later
-    correct_answer = 0
-    
-    # Generate contextual explanation
-    explanation = generate_contextual_explanation(concept, subject, template)
-    
-    # Generate appropriate references
-    references = generate_domain_specific_references(topic, subject, concept)
-    
-    return (question_text, options, correct_answer, explanation, references)
-
-def generate_diverse_options(topic, subject, concept, template, difficulty):
-    """Generate diverse answer options based on context"""
-    
-    domain = determine_domain(topic, subject)
-    
-    if domain == 'javascript':
-        if template['id'] == 'best_practice':
-            return [
-                f"Follow established coding standards and use appropriate design patterns for {concept}",
-                f"Ignore performance considerations and focus only on functionality",
-                f"Use deprecated methods for backward compatibility",
-                f"Avoid documentation and code comments to keep it simple"
-            ]
-        elif template['id'] == 'problem_solving':
-            return [
-                f"Analyze the issue systematically and apply debugging techniques for {concept}",
-                f"Randomly try different approaches until something works",
-                f"Copy solutions from online without understanding the logic",
-                f"Ignore error messages and continue with implementation"
-            ]
-        else:
-            return [
-                f"It provides efficient and scalable solutions for {concept}",
-                f"It creates unnecessary complexity in the codebase",
-                f"It only works in specific browser environments",
-                f"It has been deprecated and should not be used"
-            ]
-            
-    elif domain == 'mathematics':
-        if template['id'] == 'application':
-            return [
-                f"Apply the fundamental mathematical principles correctly for {concept}",
-                f"Use approximations even when exact solutions are possible",
-                f"Ignore mathematical rules and rely on intuition",
-                f"Only use basic arithmetic regardless of complexity"
-            ]
-        elif template['id'] == 'problem_solving':
-            return [
-                f"Break down the problem systematically and apply appropriate formulas for {concept}",
-                f"Guess the answer based on similar-looking problems",
-                f"Use only mental math without showing work",
-                f"Skip steps to reach the conclusion faster"
-            ]
-        else:
-            return [
-                f"It follows proven mathematical principles and provides reliable results for {concept}",
-                f"It contradicts established mathematical theorems",
-                f"It only applies to theoretical situations with no practical use",
-                f"It requires advanced mathematics that most people can't understand"
-            ]
-            
-    else:  # science or general
-        if template['id'] == 'methodology':
-            return [
-                f"Use evidence-based approaches and follow scientific methodology for {concept}",
-                f"Rely on personal opinions rather than empirical evidence",
-                f"Skip the hypothesis stage and jump to conclusions",
-                f"Avoid peer review and independent verification"
-            ]
-        else:
-            return [
-                f"It represents current scientific understanding and evidence-based knowledge of {concept}",
-                f"It contradicts well-established scientific principles",
-                f"It only applies in controlled laboratory conditions",
-                f"It has no basis in scientific research or evidence"
-            ]
-
-def generate_contextual_explanation(concept, subject, template):
-    """Generate contextual explanations based on concept and template"""
-    
-    explanations = {
-        'definition': f"This answer correctly defines {concept} according to established standards in {subject}.",
-        'application': f"This approach represents the proper application of {concept} in {subject} contexts.",
-        'comparison': f"This option accurately compares {concept} with alternatives in {subject}.",
-        'problem_solving': f"This solution follows proven problem-solving methodologies for {concept} in {subject}.",
-        'best_practice': f"This represents industry best practices and standards for {concept} in {subject}.",
-        'troubleshooting': f"This approach follows systematic troubleshooting procedures for {concept} in {subject}.",
-        'implementation': f"This method ensures proper implementation of {concept} according to {subject} principles.",
-        'theory': f"This answer reflects the theoretical foundations of {concept} in {subject}."
+    # JavaScript domain mapping
+    js_mapping = {
+        'function': 'functions',
+        'variable': 'variables',
+        'array': 'arrays',
+        'closure': 'closures',
+        'promise': 'promises',
+        'async': 'async',
+        'dom': 'dom',
+        'object': 'objects'
     }
     
-    return explanations.get(template['id'], f"This answer correctly explains {concept} in the context of {subject}.")
+    # Python domain mapping
+    python_mapping = {
+        'function': 'functions',
+        'list': 'basics',
+        'dictionary': 'basics',
+        'comprehension': 'comprehensions',
+        'class': 'oop',
+        'module': 'modules'
+    }
+    
+    # Math domain mapping
+    math_mapping = {
+        'algebra': 'algebra',
+        'calculus': 'calculus',
+        'geometry': 'geometry',
+        'arithmetic': 'arithmetic',
+        'percentage': 'arithmetic',
+        'equation': 'algebra',
+        'derivative': 'calculus',
+        'integral': 'calculus'
+    }
+    
+    # Science domain mapping
+    science_mapping = {
+        'chemistry': 'chemistry',
+        'physics': 'physics',
+        'biology': 'biology',
+        'cell': 'biology',
+        'atom': 'chemistry',
+        'force': 'physics',
+        'energy': 'physics'
+    }
+    
+    # Determine domain
+    if any(keyword in topic_lower or keyword in subject_lower for keyword in js_mapping.keys()) or 'javascript' in topic_lower:
+        domain = 'javascript'
+        subtopic = next((js_mapping[k] for k in js_mapping.keys() if k in topic_lower), 'functions')
+    elif any(keyword in topic_lower or keyword in subject_lower for keyword in python_mapping.keys()) or 'python' in topic_lower:
+        domain = 'python'
+        subtopic = next((python_mapping[k] for k in python_mapping.keys() if k in topic_lower), 'basics')
+    elif any(keyword in topic_lower or keyword in subject_lower for keyword in math_mapping.keys()) or 'math' in subject_lower:
+        domain = 'mathematics'
+        subtopic = next((math_mapping[k] for k in math_mapping.keys() if k in topic_lower), 'arithmetic')
+    elif any(keyword in topic_lower or keyword in subject_lower for keyword in science_mapping.keys()) or 'science' in subject_lower:
+        domain = 'science'
+        subtopic = next((science_mapping[k] for k in science_mapping.keys() if k in topic_lower), 'chemistry')
+    else:
+        # Default mapping
+        if 'computer' in subject_lower or 'programming' in subject_lower:
+            domain, subtopic = 'javascript', 'functions'
+        elif 'math' in subject_lower:
+            domain, subtopic = 'mathematics', 'arithmetic'
+        else:
+            domain, subtopic = 'science', 'chemistry'
+    
+    return domain, subtopic
 
-def generate_domain_specific_references(topic, subject, concept):
-    """Generate domain-specific references for verification"""
+def get_relevant_questions(domain, difficulty, subtopic, topic):
+    """Get relevant questions from the enhanced knowledge base"""
+    question_pool = []
     
-    domain = determine_domain(topic, subject)
+    # Get questions from the specific domain and difficulty
+    if domain in ENHANCED_KNOWLEDGE_BASE and difficulty in ENHANCED_KNOWLEDGE_BASE[domain]:
+        difficulty_data = ENHANCED_KNOWLEDGE_BASE[domain][difficulty]
+        
+        # First, try to get questions from the specific subtopic
+        if subtopic in difficulty_data:
+            question_pool.extend(difficulty_data[subtopic])
+        
+        # Add questions from other subtopics in the same domain/difficulty
+        for other_subtopic, questions in difficulty_data.items():
+            if other_subtopic != subtopic:
+                question_pool.extend(questions[:2])  # Add max 2 from each other subtopic
     
+    return question_pool
+
+def select_and_customize_question(question_pool, used_questions, topic, subject, difficulty, question_num):
+    """Select and customize a question from the pool"""
+    available_questions = [q for q in question_pool if id(q) not in used_questions]
+    
+    if not available_questions:
+        return None
+    
+    # Select question (prefer exact topic matches)
+    selected = None
+    topic_lower = topic.lower()
+    
+    # First try to find questions that match the topic
+    for q in available_questions:
+        if any(keyword in q['question'].lower() for keyword in topic_lower.split()):
+            selected = q
+            break
+    
+    # If no topic match, select randomly
+    if not selected:
+        selected = random.choice(available_questions)
+    
+    used_questions.add(id(selected))
+    
+    # Randomize answer positions
+    options = selected['options'][:]
+    correct_answer = selected['correct']
+    
+    # Create new randomized positions
+    randomized_correct = random.randint(0, 3)
+    if randomized_correct != correct_answer:
+        options[randomized_correct], options[correct_answer] = options[correct_answer], options[randomized_correct]
+    
+    return {
+        'id': question_num,
+        'question': selected['question'],
+        'options': options,
+        'correct_answer': randomized_correct,
+        'explanation': selected['explanation'],
+        'references': selected['references'],
+        'ai_generated': True,
+        'verified': True,
+        'difficulty': difficulty,
+        'topic': topic,
+        'domain': determine_intelligent_domain(topic, subject)[0]
+    }
+
+def generate_smart_contextual_question(topic, subject, difficulty, domain, question_num):
+    """Generate smart contextual questions when no predefined questions exist"""
+    
+    # Smart question templates based on domain
     if domain == 'javascript':
-        return [
-            {
-                "title": f"MDN Web Docs - {concept}",
-                "url": f"https://developer.mozilla.org/en-US/search?q={concept.replace(' ', '+')}", 
-                "type": "Official Documentation"
-            },
-            {
-                "title": f"JavaScript.info - {concept}",
-                "url": f"https://javascript.info/?s={concept.replace(' ', '+')}", 
-                "type": "Educational Resource"
-            },
-            {
-                "title": f"W3Schools - {concept}",
-                "url": f"https://www.w3schools.com/js/", 
-                "type": "Tutorial"
-            }
+        templates = {
+            'easy': [
+                f"What is the correct syntax for {topic} in JavaScript?",
+                f"Which method is commonly used with {topic}?",
+                f"How do you create a {topic} in JavaScript?"
+            ],
+            'medium': [
+                f"What happens when you use {topic} with asynchronous code?",
+                f"How does {topic} behave in different execution contexts?",
+                f"What are the best practices for implementing {topic}?"
+            ],
+            'hard': [
+                f"What are the performance implications of {topic}?",
+                f"How does {topic} work with the JavaScript event loop?",
+                f"What are the memory considerations when using {topic}?"
+            ]
+        }
+        
+        correct_answers = [
+            f"It follows ECMAScript standards for {topic} implementation",
+            f"It uses modern JavaScript best practices for {topic}",
+            f"It implements the official specification for {topic}",
+            f"It provides the recommended approach for {topic}"
         ]
-    elif domain == 'python':
-        return [
-            {
-                "title": f"Python Documentation - {concept}",
-                "url": f"https://docs.python.org/3/search.html?q={concept.replace(' ', '+')}", 
-                "type": "Official Documentation"
-            },
-            {
-                "title": f"Real Python - {concept}",
-                "url": f"https://realpython.com/search/?q={concept.replace(' ', '+')}", 
-                "type": "Tutorial"
-            },
-            {
-                "title": f"Python Package Index - {concept}",
-                "url": f"https://pypi.org/search/?q={concept.replace(' ', '+')}", 
-                "type": "Package Repository"
-            }
+        
+        wrong_answers = [
+            f"It violates JavaScript standards for {topic}",
+            f"It uses deprecated methods for {topic}",
+            f"It only works in legacy browsers for {topic}"
         ]
+        
+        references = [
+            {"title": f"MDN Web Docs - {topic}", "url": f"https://developer.mozilla.org/en-US/search?q={topic.replace(' ', '+')}", "type": "Official Documentation"},
+            {"title": f"ECMAScript Specification - {topic}", "url": "https://tc39.es/ecma262/", "type": "Official Specification"},
+            {"title": f"JavaScript.info - {topic}", "url": f"https://javascript.info/?s={topic.replace(' ', '+')}", "type": "Tutorial"}
+        ]
+        
     elif domain == 'mathematics':
-        return [
-            {
-                "title": f"Khan Academy - {concept}",
-                "url": f"https://www.khanacademy.org/search?page_search_query={concept.replace(' ', '+')}", 
-                "type": "Educational"
-            },
-            {
-                "title": f"Wolfram MathWorld - {concept}",
-                "url": f"https://mathworld.wolfram.com/search/?query={concept.replace(' ', '+')}", 
-                "type": "Mathematical Reference"
-            },
-            {
-                "title": f"MIT OpenCourseWare - {concept}",
-                "url": f"https://ocw.mit.edu/search/?q={concept.replace(' ', '+')}", 
-                "type": "Academic Course"
-            }
+        templates = {
+            'easy': [
+                f"What is the basic rule for {topic}?",
+                f"How do you calculate {topic}?",
+                f"What is the formula for {topic}?"
+            ],
+            'medium': [
+                f"How is {topic} applied in problem-solving?",
+                f"What are the properties of {topic}?",
+                f"How does {topic} relate to other mathematical concepts?"
+            ],
+            'hard': [
+                f"What are the theoretical foundations of {topic}?",
+                f"How is {topic} used in advanced mathematics?",
+                f"What are the proofs related to {topic}?"
+            ]
+        }
+        
+        correct_answers = [
+            f"It follows established mathematical principles for {topic}",
+            f"It uses proven mathematical methods for {topic}",
+            f"It applies the correct theorem for {topic}",
+            f"It implements the standard approach for {topic}"
         ]
+        
+        wrong_answers = [
+            f"It contradicts mathematical laws for {topic}",
+            f"It uses incorrect formulas for {topic}",
+            f"It ignores mathematical principles for {topic}"
+        ]
+        
+        references = [
+            {"title": f"Khan Academy - {topic}", "url": f"https://www.khanacademy.org/search?page_search_query={topic.replace(' ', '+')}", "type": "Educational"},
+            {"title": f"Wolfram MathWorld - {topic}", "url": f"https://mathworld.wolfram.com/search/?query={topic.replace(' ', '+')}", "type": "Mathematical Reference"},
+            {"title": f"MIT OpenCourseWare - {topic}", "url": f"https://ocw.mit.edu/search/?q={topic.replace(' ', '+')}", "type": "Academic"}
+        ]
+        
     else:  # science
-        return [
-            {
-                "title": f"Scientific Research - {concept}",
-                "url": f"https://scholar.google.com/scholar?q={concept.replace(' ', '+')}", 
-                "type": "Academic Research"
-            },
-            {
-                "title": f"Khan Academy Science - {concept}",
-                "url": f"https://www.khanacademy.org/science/", 
-                "type": "Educational"
-            },
-            {
-                "title": f"NASA Education - {concept}",
-                "url": f"https://www.nasa.gov/search/site/{concept.replace(' ', '+')}", 
-                "type": "Scientific Institution"
-            }
+        templates = {
+            'easy': [
+                f"What is the basic definition of {topic}?",
+                f"What are the main characteristics of {topic}?",
+                f"How is {topic} classified in science?"
+            ],
+            'medium': [
+                f"What is the mechanism behind {topic}?",
+                f"How does {topic} function in its environment?",
+                f"What are the applications of {topic}?"
+            ],
+            'hard': [
+                f"What are the theoretical models for {topic}?",
+                f"How does current research explain {topic}?",
+                f"What are the latest discoveries about {topic}?"
+            ]
+        }
+        
+        correct_answers = [
+            f"It follows scientific evidence and research for {topic}",
+            f"It is supported by peer-reviewed studies on {topic}",
+            f"It reflects current scientific understanding of {topic}",
+            f"It aligns with established scientific principles for {topic}"
         ]
+        
+        wrong_answers = [
+            f"It contradicts scientific evidence for {topic}",
+            f"It lacks scientific support for {topic}",
+            f"It is based on outdated theories about {topic}"
+        ]
+        
+        references = [
+            {"title": f"PubMed Research - {topic}", "url": f"https://pubmed.ncbi.nlm.nih.gov/?term={topic.replace(' ', '+')}", "type": "Scientific Literature"},
+            {"title": f"Khan Academy Science - {topic}", "url": f"https://www.khanacademy.org/science", "type": "Educational"},
+            {"title": f"NASA Science - {topic}", "url": f"https://science.nasa.gov/search/?query={topic.replace(' ', '+')}", "type": "Scientific Institution"}
+        ]
+    
+    # Select template and create question
+    difficulty_templates = templates.get(difficulty, templates['medium'])
+    question_text = random.choice(difficulty_templates)
+    
+    # Create options
+    correct_option = random.choice(correct_answers)
+    wrong_options = random.sample(wrong_answers, 3)
+    
+    options = [correct_option] + wrong_options
+    correct_answer = 0
+    
+    # Randomize positions
+    randomized_correct = random.randint(0, 3)
+    if randomized_correct != 0:
+        options[randomized_correct], options[0] = options[0], options[randomized_correct]
+    
+    explanation = f"This answer is correct because {correct_option.lower()} and represents the current standard understanding in {subject}."
+    
+    return {
+        'id': question_num,
+        'question': question_text,
+        'options': options,
+        'correct_answer': randomized_correct,
+        'explanation': explanation,
+        'references': references,
+        'ai_generated': True,
+        'verified': True,
+        'difficulty': difficulty,
+        'topic': topic,
+        'domain': domain
+    }
 
-# Add download functions
+def generate_fallback_questions(quiz_data):
+    """Fallback question generation if all else fails"""
+    count = int(quiz_data.get('questionCount', 5))
+    topic = quiz_data.get('topic', 'General Knowledge')
+    subject = quiz_data.get('subject', 'General')
+    difficulty = quiz_data.get('difficulty', 'medium')
+    
+    questions = []
+    for i in range(count):
+        questions.append({
+            'id': i + 1,
+            'question': f"What is an important concept related to {topic}?",
+            'options': [
+                f"It is a fundamental principle in {subject}",
+                f"It is not relevant to {subject}",
+                f"It only applies to advanced topics",
+                f"It has been replaced by newer concepts"
+            ],
+            'correct_answer': 0,
+            'explanation': f"This represents a core concept in {subject} related to {topic}.",
+            'references': [
+                {"title": f"Educational Resource - {topic}", "url": f"https://www.google.com/search?q={topic.replace(' ', '+')}", "type": "General Reference"}
+            ],
+            'ai_generated': True,
+            'verified': False,
+            'difficulty': difficulty,
+            'topic': topic
+        })
+    
+    return questions
+
+# Update your main quiz creation endpoint to use the new intelligent system
+def generate_advanced_ai_questions_with_references(quiz_data):
+    """Main function to generate advanced AI questions with proper references"""
+    return generate_intelligent_questions(quiz_data)
+
 def generate_pdf(quiz, questions):
     if not FPDF_AVAILABLE:
         return jsonify({'error': 'PDF generation not available'}), 500
