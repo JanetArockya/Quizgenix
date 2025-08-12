@@ -85,338 +85,564 @@ class QuizSession(db.Model):
     current_question = db.Column(db.Integer, default=0)
     answers_so_far = db.Column(db.Text, default='{}')  # JSON of answers
 
-# Enhanced Knowledge Base with Real, Specific Content
-ENHANCED_KNOWLEDGE_BASE = {
-    'javascript': {
-        'easy': {
-            'functions': [
-                {
-                    'question': "What is the correct syntax to declare a function in JavaScript?",
-                    'options': [
-                        "function myFunction() { }",
-                        "def myFunction() { }",
-                        "function: myFunction() { }",
-                        "create function myFunction() { }"
-                    ],
-                    'correct': 0,
-                    'explanation': "JavaScript functions are declared using the 'function' keyword followed by the function name and parentheses.",
-                    'references': [
-                        {"title": "MDN - Function Declarations", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions", "type": "Official Documentation"},
-                        {"title": "JavaScript.info - Functions", "url": "https://javascript.info/function-basics", "type": "Tutorial"},
-                        {"title": "W3Schools - JavaScript Functions", "url": "https://www.w3schools.com/js/js_functions.asp", "type": "Learning Resource"}
-                    ]
-                },
-                {
-                    'question': "Which method adds an element to the end of an array?",
-                    'options': [
-                        "push()",
-                        "append()",
-                        "add()",
-                        "insert()"
-                    ],
-                    'correct': 0,
-                    'explanation': "The push() method adds one or more elements to the end of an array and returns the new length of the array.",
-                    'references': [
-                        {"title": "MDN - Array.prototype.push()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/push", "type": "Official Documentation"},
-                        {"title": "JavaScript Array Methods", "url": "https://javascript.info/array-methods", "type": "Tutorial"}
-                    ]
-                },
-                {
-                    'question': "What does the '===' operator do in JavaScript?",
-                    'options': [
-                        "Checks for strict equality (value and type)",
-                        "Assigns a value to a variable",
-                        "Checks for loose equality (value only)",
-                        "Compares two strings only"
-                    ],
-                    'correct': 0,
-                    'explanation': "The '===' operator performs strict equality comparison, checking both value and type without type coercion.",
-                    'references': [
-                        {"title": "MDN - Strict Equality", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Strict_equality", "type": "Official Documentation"},
-                        {"title": "JavaScript Comparison Operators", "url": "https://javascript.info/comparison", "type": "Tutorial"}
-                    ]
-                }
-            ],
-            'variables': [
-                {
-                    'question': "Which keyword is used to declare a block-scoped variable in modern JavaScript?",
-                    'options': [
-                        "let",
-                        "var",
-                        "const",
-                        "variable"
-                    ],
-                    'correct': 0,
-                    'explanation': "The 'let' keyword declares block-scoped variables that can be reassigned, introduced in ES6.",
-                    'references': [
-                        {"title": "MDN - let", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/let", "type": "Official Documentation"},
-                        {"title": "JavaScript Variables", "url": "https://javascript.info/variables", "type": "Tutorial"}
-                    ]
-                }
-            ],
-            'arrays': [
-                {
-                    'question': "How do you access the first element of an array named 'fruits'?",
-                    'options': [
-                        "fruits[0]",
-                        "fruits[1]",
-                        "fruits.first()",
-                        "fruits.get(0)"
-                    ],
-                    'correct': 0,
-                    'explanation': "JavaScript arrays are zero-indexed, so the first element is accessed using index 0.",
-                    'references': [
-                        {"title": "MDN - Arrays", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array", "type": "Official Documentation"},
-                        {"title": "JavaScript Array Basics", "url": "https://javascript.info/array", "type": "Tutorial"}
-                    ]
-                }
-            ]
-        },
-        'medium': {
-            'closures': [
-                {
-                    'question': "What will the following code output?\n```javascript\nfunction outer() {\n  let x = 10;\n  return function inner() {\n    console.log(x);\n  };\n}\nconst fn = outer();\nfn();\n```",
-                    'options': [
-                        "10",
-                        "undefined",
-                        "Error",
-                        "null"
-                    ],
-                    'correct': 0,
-                    'explanation': "This demonstrates closure - the inner function retains access to the outer function's variable 'x' even after outer() has finished executing.",
-                    'references': [
-                        {"title": "MDN - Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures", "type": "Official Documentation"},
-                        {"title": "JavaScript Closures Explained", "url": "https://javascript.info/closure", "type": "Tutorial"}
-                    ]
-                }
-            ],
-            'promises': [
-                {
-                    'question': "Which method is used to handle a resolved Promise?",
-                    'options': [
-                        ".then()",
-                        ".catch()",
-                        ".finally()",
-                        ".resolve()"
-                    ],
-                    'correct': 0,
-                    'explanation': "The .then() method is used to handle the successful resolution of a Promise and receive its resolved value.",
-                    'references': [
-                        {"title": "MDN - Promise.prototype.then()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then", "type": "Official Documentation"},
-                        {"title": "JavaScript Promises", "url": "https://javascript.info/promise-basics", "type": "Tutorial"}
-                    ]
-                }
-            ]
-        },
-        'hard': {
-            'async': [
-                {
-                    'question': "What is the difference between Promise.all() and Promise.allSettled()?",
-                    'options': [
-                        "Promise.all() fails fast on first rejection, Promise.allSettled() waits for all to complete",
-                        "Promise.all() waits for all, Promise.allSettled() fails fast",
-                        "They work exactly the same",
-                        "Promise.allSettled() only works with async/await"
-                    ],
-                    'correct': 0,
-                    'explanation': "Promise.all() rejects immediately when any input promise rejects, while Promise.allSettled() waits for all promises to settle (fulfill or reject).",
-                    'references': [
-                        {"title": "MDN - Promise.all()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all", "type": "Official Documentation"},
-                        {"title": "MDN - Promise.allSettled()", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled", "type": "Official Documentation"}
-                    ]
-                }
-            ]
-        }
+# Enhanced Knowledge Base with Topic-Specific Content and Comprehensive References
+TOPIC_FOCUSED_KNOWLEDGE_BASE = {
+    'javascript_functions': {
+        'easy': [
+            {
+                'question': "What is the correct syntax to declare a function named 'calculateSum' in JavaScript?",
+                'options': [
+                    "function calculateSum() { }",
+                    "def calculateSum() { }",
+                    "function: calculateSum() { }",
+                    "create function calculateSum() { }"
+                ],
+                'correct': 0,
+                'explanation': "JavaScript functions are declared using the 'function' keyword followed by the function name and parentheses. This is the standard ES5 function declaration syntax.",
+                'references': [
+                    {"title": "MDN - Function Declarations", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions", "type": "Official Documentation", "description": "Complete guide to JavaScript functions including declaration syntax"},
+                    {"title": "JavaScript.info - Function Basics", "url": "https://javascript.info/function-basics", "type": "Tutorial", "description": "Interactive tutorial on JavaScript function fundamentals"},
+                    {"title": "W3Schools - JavaScript Functions", "url": "https://www.w3schools.com/js/js_functions.asp", "type": "Learning Resource", "description": "Beginner-friendly examples of JavaScript function usage"}
+                ]
+            },
+            {
+                'question': "How do you call a function named 'greetUser' with a parameter 'name'?",
+                'options': [
+                    "greetUser(name);",
+                    "call greetUser(name);",
+                    "invoke greetUser(name);",
+                    "execute greetUser(name);"
+                ],
+                'correct': 0,
+                'explanation': "In JavaScript, functions are called by using the function name followed by parentheses containing arguments. This is the standard function invocation syntax.",
+                'references': [
+                    {"title": "MDN - Calling Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#calling_functions", "type": "Official Documentation", "description": "Detailed explanation of how to call functions in JavaScript"},
+                    {"title": "JavaScript Function Invocation", "url": "https://javascript.info/function-basics#function-calling", "type": "Tutorial", "description": "Learn different ways to invoke JavaScript functions"}
+                ]
+            }
+        ],
+        'medium': [
+            {
+                'question': "What is a JavaScript closure and how does it work with functions?",
+                'options': [
+                    "A closure gives access to outer function's variables from inner function even after outer function returns",
+                    "A closure is a way to hide functions from global scope",
+                    "A closure is a method to combine multiple functions into one",
+                    "A closure is a JavaScript error that occurs when functions overlap"
+                ],
+                'correct': 0,
+                'explanation': "A closure in JavaScript is created when an inner function has access to variables from its outer (enclosing) function's scope even after the outer function has returned. This is fundamental to JavaScript's scope chain.",
+                'references': [
+                    {"title": "MDN - Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures", "type": "Official Documentation", "description": "Comprehensive guide to understanding JavaScript closures"},
+                    {"title": "JavaScript Closures Explained", "url": "https://javascript.info/closure", "type": "Tutorial", "description": "Step-by-step explanation of closures with examples"},
+                    {"title": "You Don't Know JS - Closures", "url": "https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures", "type": "Advanced Reference", "description": "Deep dive into JavaScript closures and scope"}
+                ]
+            }
+        ]
     },
-    'python': {
-        'easy': {
-            'basics': [
-                {
-                    'question': "Which of the following is the correct way to create a list in Python?",
-                    'options': [
-                        "my_list = [1, 2, 3]",
-                        "my_list = (1, 2, 3)",
-                        "my_list = {1, 2, 3}",
-                        "my_list = <1, 2, 3>"
-                    ],
-                    'correct': 0,
-                    'explanation': "Lists in Python are created using square brackets [] and can contain multiple data types.",
-                    'references': [
-                        {"title": "Python.org - Lists", "url": "https://docs.python.org/3/tutorial/datastructures.html#more-on-lists", "type": "Official Documentation"},
-                        {"title": "Real Python - Lists", "url": "https://realpython.com/python-lists-tuples/", "type": "Tutorial"}
-                    ]
-                }
-            ],
-            'functions': [
-                {
-                    'question': "What keyword is used to define a function in Python?",
-                    'options': [
-                        "def",
-                        "function",
-                        "define",
-                        "func"
-                    ],
-                    'correct': 0,
-                    'explanation': "The 'def' keyword is used to define functions in Python, followed by the function name and parameters.",
-                    'references': [
-                        {"title": "Python.org - Defining Functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions", "type": "Official Documentation"},
-                        {"title": "Real Python - Functions", "url": "https://realpython.com/defining-your-own-python-function/", "type": "Tutorial"}
-                    ]
-                }
-            ]
-        },
-        'medium': {
-            'comprehensions': [
-                {
-                    'question': "What will this list comprehension produce?\n```python\n[x**2 for x in range(5) if x % 2 == 0]\n```",
-                    'options': [
-                        "[0, 4, 16]",
-                        "[0, 1, 4, 9, 16]",
-                        "[1, 9]",
-                        "[0, 2, 4]"
-                    ],
-                    'correct': 0,
-                    'explanation': "This creates a list of squares for even numbers in range(5): 0²=0, 2²=4, 4²=16.",
-                    'references': [
-                        {"title": "Python.org - List Comprehensions", "url": "https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions", "type": "Official Documentation"},
-                        {"title": "Real Python - List Comprehensions", "url": "https://realpython.com/list-comprehension-python/", "type": "Tutorial"}
-                    ]
-                }
-            ]
-        }
+    'python_functions': {
+        'easy': [
+            {
+                'question': "What is the correct way to define a function called 'add_numbers' in Python?",
+                'options': [
+                    "def add_numbers():",
+                    "function add_numbers():",
+                    "define add_numbers():",
+                    "func add_numbers():"
+                ],
+                'correct': 0,
+                'explanation': "In Python, functions are defined using the 'def' keyword followed by the function name, parameters in parentheses, and a colon. This is Python's standard function definition syntax.",
+                'references': [
+                    {"title": "Python.org - Defining Functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions", "type": "Official Documentation", "description": "Official Python documentation on function definition"},
+                    {"title": "Real Python - Python Functions", "url": "https://realpython.com/defining-your-own-python-function/", "type": "Tutorial", "description": "Comprehensive tutorial on Python function creation and usage"},
+                    {"title": "Python Functions - GeeksforGeeks", "url": "https://www.geeksforgeeks.org/python-functions/", "type": "Learning Resource", "description": "Complete guide to Python functions with examples"}
+                ]
+            }
+        ],
+        'medium': [
+            {
+                'question': "What are Python decorators in relation to functions?",
+                'options': [
+                    "Functions that modify or enhance other functions without changing their code",
+                    "Functions that decorate the output with special formatting",
+                    "Functions that can only be used inside classes",
+                    "Functions that automatically generate documentation"
+                ],
+                'correct': 0,
+                'explanation': "Python decorators are a powerful feature that allows you to modify or enhance functions without permanently modifying their code. They use the @ symbol and are applied above function definitions.",
+                'references': [
+                    {"title": "Python.org - Decorators", "url": "https://docs.python.org/3/library/functools.html#functools.wraps", "type": "Official Documentation", "description": "Official documentation on Python decorators and functools"},
+                    {"title": "Real Python - Python Decorators", "url": "https://realpython.com/primer-on-python-decorators/", "type": "Tutorial", "description": "Complete primer on understanding and using Python decorators"},
+                    {"title": "Python Decorator Patterns", "url": "https://python-patterns.guide/python/decorators/", "type": "Advanced Reference", "description": "Design patterns and best practices for Python decorators"}
+                ]
+            }
+        ]
     },
-    'mathematics': {
-        'easy': {
-            'arithmetic': [
-                {
-                    'question': "What is 15% of 200?",
-                    'options': [
-                        "30",
-                        "25",
-                        "35",
-                        "20"
-                    ],
-                    'correct': 0,
-                    'explanation': "15% of 200 = (15/100) × 200 = 0.15 × 200 = 30",
-                    'references': [
-                        {"title": "Khan Academy - Percentages", "url": "https://www.khanacademy.org/math/arithmetic/arith-percents", "type": "Educational"},
-                        {"title": "Math is Fun - Percentages", "url": "https://www.mathsisfun.com/percentage/", "type": "Learning Resource"}
-                    ]
-                }
-            ],
-            'geometry': [
-                {
-                    'question': "What is the area of a rectangle with length 8 and width 5?",
-                    'options': [
-                        "40",
-                        "26",
-                        "13",
-                        "45"
-                    ],
-                    'correct': 0,
-                    'explanation': "Area of rectangle = length × width = 8 × 5 = 40 square units",
-                    'references': [
-                        {"title": "Khan Academy - Area of Rectangles", "url": "https://www.khanacademy.org/math/basic-geo/basic-geo-area-and-perimeter", "type": "Educational"},
-                        {"title": "Math is Fun - Rectangle Area", "url": "https://www.mathsisfun.com/geometry/rectangle.html", "type": "Learning Resource"}
-                    ]
-                }
-            ]
-        },
-        'medium': {
-            'algebra': [
-                {
-                    'question': "Solve for x: 3x + 7 = 22",
-                    'options': [
-                        "x = 5",
-                        "x = 7",
-                        "x = 15",
-                        "x = 3"
-                    ],
-                    'correct': 0,
-                    'explanation': "3x + 7 = 22 → 3x = 22 - 7 → 3x = 15 → x = 15 ÷ 3 → x = 5",
-                    'references': [
-                        {"title": "Khan Academy - Linear Equations", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-in-one-variable", "type": "Educational"},
-                        {"title": "Purplemath - Solving Linear Equations", "url": "https://www.purplemath.com/modules/solvelin.htm", "type": "Tutorial"}
-                    ]
-                }
-            ],
-            'calculus': [
-                {
-                    'question': "What is the derivative of f(x) = 3x²?",
-                    'options': [
-                        "6x",
-                        "3x",
-                        "6x²",
-                        "9x"
-                    ],
-                    'correct': 0,
-                    'explanation': "Using the power rule: d/dx(3x²) = 3 × 2x^(2-1) = 6x",
-                    'references': [
-                        {"title": "Khan Academy - Power Rule", "url": "https://www.khanacademy.org/math/calculus-1/cs1-derivatives-definition-and-basic-rules/cs1-power-rule", "type": "Educational"},
-                        {"title": "Paul's Online Math Notes - Derivatives", "url": "https://tutorial.math.lamar.edu/Classes/CalcI/DefnOfDerivative.aspx", "type": "Tutorial"}
-                    ]
-                }
-            ]
-        }
+    'algebra_equations': {
+        'easy': [
+            {
+                'question': "To solve the linear equation 2x + 5 = 13, what is the first step?",
+                'options': [
+                    "Subtract 5 from both sides",
+                    "Divide both sides by 2",
+                    "Add 5 to both sides",
+                    "Multiply both sides by 2"
+                ],
+                'correct': 0,
+                'explanation': "When solving linear equations, follow the order of operations in reverse. Since 5 is added to 2x, the first step is to subtract 5 from both sides to isolate the term with x.",
+                'references': [
+                    {"title": "Khan Academy - Linear Equations", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-in-one-variable", "type": "Educational", "description": "Interactive lessons on solving linear equations step by step"},
+                    {"title": "Purplemath - Solving Linear Equations", "url": "https://www.purplemath.com/modules/solvelin.htm", "type": "Tutorial", "description": "Detailed explanation of linear equation solving techniques"},
+                    {"title": "Math is Fun - Solving Equations", "url": "https://www.mathsisfun.com/algebra/linear-equations-solving.html", "type": "Learning Resource", "description": "Visual guide to solving algebraic equations"}
+                ]
+            }
+        ],
+        'medium': [
+            {
+                'question': "What is the solution to the quadratic equation x² - 5x + 6 = 0?",
+                'options': [
+                    "x = 2, x = 3",
+                    "x = 1, x = 6",
+                    "x = -2, x = -3",
+                    "x = 5, x = 1"
+                ],
+                'correct': 0,
+                'explanation': "Using factoring: x² - 5x + 6 = (x - 2)(x - 3) = 0. Therefore x = 2 or x = 3. You can verify: 2² - 5(2) + 6 = 4 - 10 + 6 = 0 ✓",
+                'references': [
+                    {"title": "Khan Academy - Quadratic Equations", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratic-functions-equations", "type": "Educational", "description": "Comprehensive course on quadratic equations and their solutions"},
+                    {"title": "Wolfram MathWorld - Quadratic Equation", "url": "https://mathworld.wolfram.com/QuadraticEquation.html", "type": "Mathematical Reference", "description": "Complete mathematical reference for quadratic equations"},
+                    {"title": "Paul's Online Math Notes - Quadratics", "url": "https://tutorial.math.lamar.edu/Classes/Alg/SolveQuadraticEqnsII.aspx", "type": "Advanced Tutorial", "description": "Detailed methods for solving quadratic equations"}
+                ]
+            }
+        ]
     },
-    'science': {
-        'easy': {
-            'chemistry': [
-                {
-                    'question': "What is the chemical formula for table salt?",
-                    'options': [
-                        "NaCl",
-                        "H₂O",
-                        "CO₂",
-                        "CaCl₂"
-                    ],
-                    'correct': 0,
-                    'explanation': "Table salt is sodium chloride, composed of one sodium (Na) and one chlorine (Cl) atom.",
-                    'references': [
-                        {"title": "NIST Chemistry WebBook", "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=7647-14-5", "type": "Scientific Database"},
-                        {"title": "Khan Academy - Ionic Compounds", "url": "https://www.khanacademy.org/science/chemistry/chemical-bonds/types-chemical-bonds/a/ionic-bonds", "type": "Educational"}
-                    ]
-                }
-            ],
-            'physics': [
-                {
-                    'question': "What is the acceleration due to gravity on Earth (approximately)?",
-                    'options': [
-                        "9.8 m/s²",
-                        "10.8 m/s²",
-                        "8.8 m/s²",
-                        "11.8 m/s²"
-                    ],
-                    'correct': 0,
-                    'explanation': "The standard acceleration due to gravity on Earth is approximately 9.8 meters per second squared.",
-                    'references': [
-                        {"title": "NIST Physical Constants", "url": "https://physics.nist.gov/cgi-bin/cuu/Value?gn", "type": "Scientific Database"},
-                        {"title": "Khan Academy - Gravity", "url": "https://www.khanacademy.org/science/physics/forces-newtons-laws/normal-contact-force/a/what-is-weight", "type": "Educational"}
-                    ]
-                }
-            ]
-        },
-        'medium': {
-            'biology': [
-                {
-                    'question': "Which organelle is responsible for cellular respiration?",
-                    'options': [
-                        "Mitochondria",
-                        "Chloroplast",
-                        "Nucleus",
-                        "Ribosome"
-                    ],
-                    'correct': 0,
-                    'explanation': "Mitochondria are the powerhouses of the cell, converting glucose and oxygen into ATP through cellular respiration.",
-                    'references': [
-                        {"title": "NCBI - Mitochondria", "url": "https://www.ncbi.nlm.nih.gov/books/NBK9896/", "type": "Scientific Literature"},
-                        {"title": "Khan Academy - Cellular Respiration", "url": "https://www.khanacademy.org/science/biology/cellular-respiration-and-fermentation", "type": "Educational"}
-                    ]
-                }
-            ]
-        }
+    'chemistry_compounds': {
+        'easy': [
+            {
+                'question': "What type of chemical compound is table salt (NaCl)?",
+                'options': [
+                    "Ionic compound",
+                    "Covalent compound",
+                    "Metallic compound",
+                    "Organic compound"
+                ],
+                'correct': 0,
+                'explanation': "Table salt (NaCl) is an ionic compound formed by the electrostatic attraction between sodium cations (Na⁺) and chloride anions (Cl⁻). Sodium loses an electron to chlorine, forming ions.",
+                'references': [
+                    {"title": "NIST Chemistry WebBook - Sodium Chloride", "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=7647-14-5", "type": "Scientific Database", "description": "Official chemical data for sodium chloride"},
+                    {"title": "Khan Academy - Ionic Bonds", "url": "https://www.khanacademy.org/science/chemistry/chemical-bonds/types-chemical-bonds/a/ionic-bonds", "type": "Educational", "description": "Learn how ionic compounds like NaCl are formed"},
+                    {"title": "LibreTexts - Ionic Compounds", "url": "https://chem.libretexts.org/Courses/can/intro/04%3A_Ions_and_Ionic_Compounds", "type": "Academic Reference", "description": "Comprehensive guide to understanding ionic compounds"}
+                ]
+            }
+        ]
     }
 }
+
+def generate_topic_focused_questions(quiz_data):
+    """Generate questions specifically focused on the given topic"""
+    try:
+        count = int(quiz_data.get('questionCount', 5))
+        topic = quiz_data.get('topic', '').lower().strip()
+        subject = quiz_data.get('subject', '').lower().strip()
+        difficulty = quiz_data.get('difficulty', 'medium').lower()
+        
+        print(f"🎯 Generating topic-focused questions for: '{topic}' in subject '{subject}' (difficulty: {difficulty})")
+        
+        # Create topic-specific key
+        topic_key = create_topic_key(topic, subject)
+        
+        # Get questions from knowledge base
+        questions = get_topic_specific_questions(topic_key, difficulty, count, topic, subject)
+        
+        # If we don't have enough topic-specific questions, generate contextual ones
+        if len(questions) < count:
+            additional_needed = count - len(questions)
+            contextual_questions = generate_contextual_topic_questions(
+                topic, subject, difficulty, additional_needed, len(questions)
+            )
+            questions.extend(contextual_questions)
+        
+        print(f"✅ Generated {len(questions)} topic-focused questions for '{topic}'")
+        return questions[:count]
+        
+    except Exception as e:
+        print(f"❌ Error in topic-focused question generation: {e}")
+        return generate_fallback_questions(quiz_data)
+
+def create_topic_key(topic, subject):
+    """Create a specific topic key based on topic and subject combination"""
+    topic_lower = topic.lower()
+    subject_lower = subject.lower()
+    
+    # Topic-specific mapping with subject context
+    topic_mappings = {
+        # JavaScript topics
+        ('function', 'javascript'): 'javascript_functions',
+        ('function', 'computer'): 'javascript_functions',
+        ('function', 'programming'): 'javascript_functions',
+        ('javascript function', 'any'): 'javascript_functions',
+        
+        # Python topics  
+        ('function', 'python'): 'python_functions',
+        ('python function', 'any'): 'python_functions',
+        ('def', 'python'): 'python_functions',
+        
+        # Math topics
+        ('algebra', 'math'): 'algebra_equations',
+        ('equation', 'math'): 'algebra_equations',
+        ('linear equation', 'any'): 'algebra_equations',
+        ('quadratic', 'math'): 'algebra_equations',
+        
+        # Chemistry topics
+        ('compound', 'chemistry'): 'chemistry_compounds',
+        ('salt', 'chemistry'): 'chemistry_compounds',
+        ('ionic', 'chemistry'): 'chemistry_compounds',
+        ('chemical compound', 'any'): 'chemistry_compounds',
+    }
+    
+    # First, try exact topic-subject match
+    for (topic_key, subject_key), result in topic_mappings.items():
+        if (topic_key in topic_lower and (subject_key == 'any' or subject_key in subject_lower)):
+            return result
+    
+    # Fallback: general topic matching
+    if 'function' in topic_lower:
+        if any(js_term in subject_lower for js_term in ['javascript', 'js', 'computer', 'programming']):
+            return 'javascript_functions'
+        elif 'python' in subject_lower:
+            return 'python_functions'
+    
+    if any(math_term in topic_lower for math_term in ['algebra', 'equation']):
+        return 'algebra_equations'
+    
+    if any(chem_term in topic_lower for chem_term in ['compound', 'chemistry', 'chemical']):
+        return 'chemistry_compounds'
+    
+    return None
+
+def get_topic_specific_questions(topic_key, difficulty, count, original_topic, original_subject):
+    """Get questions from the topic-specific knowledge base"""
+    questions = []
+    
+    if not topic_key or topic_key not in TOPIC_FOCUSED_KNOWLEDGE_BASE:
+        return questions
+    
+    topic_data = TOPIC_FOCUSED_KNOWLEDGE_BASE[topic_key]
+    
+    # Get questions for the specific difficulty
+    if difficulty in topic_data:
+        available_questions = topic_data[difficulty][:]
+        random.shuffle(available_questions)
+        
+        for i, q_data in enumerate(available_questions[:count]):
+            # Randomize answer positions
+            options = q_data['options'][:]
+            correct_answer = q_data['correct']
+            
+            randomized_correct = random.randint(0, 3)
+            if randomized_correct != correct_answer:
+                options[randomized_correct], options[correct_answer] = options[correct_answer], options[randomized_correct]
+            
+            question = {
+                'id': i + 1,
+                'question': q_data['question'],
+                'options': options,
+                'correct_answer': randomized_correct,
+                'explanation': q_data['explanation'],
+                'references': q_data['references'],
+                'ai_generated': False,
+                'verified': True,
+                'difficulty': difficulty,
+                'topic': original_topic,
+                'subject': original_subject,
+                'topic_key': topic_key
+            }
+            questions.append(question)
+    
+    return questions
+
+def generate_contextual_topic_questions(topic, subject, difficulty, count, start_id):
+    """Generate contextual questions when specific topic questions aren't available"""
+    questions = []
+    
+    # Topic-specific question templates
+    topic_templates = {
+        'function': {
+            'javascript': {
+                'easy': [
+                    f"What is the proper way to declare a {topic} in JavaScript?",
+                    f"How do you call a {topic} with parameters in JavaScript?",
+                    f"What keyword is used to create a {topic} in JavaScript?"
+                ],
+                'medium': [
+                    f"How do JavaScript {topic}s handle scope and closure?",
+                    f"What is the difference between {topic} declarations and expressions?",
+                    f"How do arrow {topic}s differ from regular {topic}s?"
+                ]
+            },
+            'python': {
+                'easy': [
+                    f"What keyword defines a {topic} in Python?",
+                    f"How do you return a value from a Python {topic}?",
+                    f"What is the correct syntax for Python {topic} parameters?"
+                ],
+                'medium': [
+                    f"How do Python {topic} decorators work?",
+                    f"What are *args and **kwargs in Python {topic}s?",
+                    f"How do Python {topic}s handle variable scope?"
+                ]
+            }
+        },
+        'equation': {
+            'mathematics': {
+                'easy': [
+                    f"What is the first step in solving a linear {topic}?",
+                    f"How do you isolate variables in an {topic}?",
+                    f"What operations are used to solve simple {topic}s?"
+                ],
+                'medium': [
+                    f"How do you solve quadratic {topic}s using factoring?",
+                    f"What is the quadratic formula for solving {topic}s?",
+                    f"How do you check if your {topic} solution is correct?"
+                ]
+            }
+        },
+        'compound': {
+            'chemistry': {
+                'easy': [
+                    f"What are the main types of chemical {topic}s?",
+                    f"How are ionic {topic}s formed?",
+                    f"What determines the properties of a {topic}?"
+                ],
+                'medium': [
+                    f"How do you name covalent {topic}s?",
+                    f"What is the difference between ionic and covalent {topic}s?",
+                    f"How do you determine molecular geometry of {topic}s?"
+                ]
+            }
+        }
+    }
+    
+    # Generate contextual options based on topic and subject
+    for i in range(count):
+        question_templates = get_contextual_templates(topic, subject, difficulty, topic_templates)
+        
+        if question_templates:
+            question_text = random.choice(question_templates)
+            options, correct_idx, explanation, references = generate_contextual_options(
+                topic, subject, difficulty, question_text
+            )
+            
+            # Randomize correct answer position
+            randomized_correct = random.randint(0, 3)
+            if randomized_correct != correct_idx:
+                options[randomized_correct], options[correct_idx] = options[correct_idx], options[randomized_correct]
+            
+            question = {
+                'id': start_id + i + 1,
+                'question': question_text,
+                'options': options,
+                'correct_answer': randomized_correct,
+                'explanation': explanation,
+                'references': references,
+                'ai_generated': True,
+                'verified': True,
+                'difficulty': difficulty,
+                'topic': topic,
+                'subject': subject
+            }
+            questions.append(question)
+    
+    return questions
+
+def get_contextual_templates(topic, subject, difficulty, topic_templates):
+    """Get appropriate question templates based on topic and subject"""
+    topic_lower = topic.lower()
+    subject_lower = subject.lower()
+    
+    # Find matching templates
+    for template_topic, subjects in topic_templates.items():
+        if template_topic in topic_lower:
+            for template_subject, difficulties in subjects.items():
+                if template_subject in subject_lower and difficulty in difficulties:
+                    return difficulties[difficulty]
+    
+    # Fallback generic templates
+    generic_templates = [
+        f"What is the fundamental concept of {topic} in {subject}?",
+        f"How is {topic} typically implemented in {subject}?",
+        f"What are the key principles of {topic}?",
+        f"How do you apply {topic} in practical scenarios?"
+    ]
+    
+    return generic_templates
+
+def generate_contextual_options(topic, subject, difficulty, question_text):
+    """Generate contextual answer options with proper explanations and references"""
+    topic_lower = topic.lower()
+    subject_lower = subject.lower()
+    
+    # Domain-specific correct answers
+    if 'javascript' in subject_lower or 'programming' in subject_lower:
+        correct_options = [
+            f"Follow ECMAScript standards and modern JavaScript best practices for {topic}",
+            f"Use the official JavaScript specification guidelines for {topic}",
+            f"Implement according to MDN documentation recommendations for {topic}",
+            f"Apply industry-standard JavaScript patterns for {topic}"
+        ]
+        
+        wrong_options = [
+            f"Use deprecated JavaScript methods for {topic}",
+            f"Ignore modern JavaScript standards for {topic}",
+            f"Only use legacy browser compatibility for {topic}",
+            f"Avoid using standard JavaScript syntax for {topic}",
+            f"Use non-standard JavaScript implementations for {topic}",
+            f"Rely on browser-specific features for {topic}"
+        ]
+        
+        references = [
+            {"title": f"MDN Web Docs - {topic}", "url": f"https://developer.mozilla.org/en-US/search?q={topic.replace(' ', '+')}", "type": "Official Documentation", "description": f"Comprehensive Mozilla documentation on {topic}"},
+            {"title": f"ECMAScript Specification", "url": "https://tc39.es/ecma262/", "type": "Official Standard", "description": "The official JavaScript language specification"},
+            {"title": f"JavaScript.info - {topic}", "url": f"https://javascript.info/?s={topic.replace(' ', '+')}", "type": "Interactive Tutorial", "description": f"Modern JavaScript tutorial covering {topic}"},
+            {"title": f"W3Schools JavaScript {topic}", "url": f"https://www.w3schools.com/js/", "type": "Learning Resource", "description": f"Beginner-friendly JavaScript {topic} examples"}
+        ]
+        
+    elif 'python' in subject_lower:
+        correct_options = [
+            f"Follow PEP standards and Pythonic principles for {topic}",
+            f"Use official Python documentation guidelines for {topic}",
+            f"Implement according to Python best practices for {topic}",
+            f"Apply the Zen of Python principles to {topic}"
+        ]
+        
+        wrong_options = [
+            f"Ignore Python conventions for {topic}",
+            f"Use non-Pythonic approaches for {topic}",
+            f"Avoid Python standard library for {topic}",
+            f"Use deprecated Python syntax for {topic}",
+            f"Ignore PEP guidelines for {topic}",
+            f"Use Java-style coding in Python for {topic}"
+        ]
+        
+        references = [
+            {"title": f"Python.org Documentation - {topic}", "url": f"https://docs.python.org/3/search.html?q={topic.replace(' ', '+')}", "type": "Official Documentation", "description": f"Official Python documentation for {topic}"},
+            {"title": f"Real Python - {topic}", "url": f"https://realpython.com/search/?q={topic.replace(' ', '+')}", "type": "Tutorial", "description": f"Practical Python tutorials on {topic}"},
+            {"title": f"Python PEP Index", "url": "https://www.python.org/dev/peps/", "type": "Standards", "description": "Python Enhancement Proposals for coding standards"},
+            {"title": f"Python Package Index", "url": f"https://pypi.org/search/?q={topic.replace(' ', '+')}", "type": "Package Repository", "description": f"Python packages related to {topic}"}
+        ]
+        
+    elif 'math' in subject_lower or 'algebra' in subject_lower:
+        correct_options = [
+            f"Apply established mathematical principles and proven theorems for {topic}",
+            f"Use standard mathematical procedures and formulas for {topic}",
+            f"Follow step-by-step mathematical problem-solving for {topic}",
+            f"Implement verified mathematical methods for {topic}"
+        ]
+        
+        wrong_options = [
+            f"Skip mathematical steps and guess answers for {topic}",
+            f"Use unproven mathematical shortcuts for {topic}",
+            f"Ignore mathematical properties for {topic}",
+            f"Apply incorrect mathematical operations for {topic}",
+            f"Use intuition instead of mathematical logic for {topic}",
+            f"Avoid showing work or verification for {topic}"
+        ]
+        
+        references = [
+            {"title": f"Khan Academy - {topic}", "url": f"https://www.khanacademy.org/search?page_search_query={topic.replace(' ', '+')}", "type": "Educational Platform", "description": f"Interactive math lessons on {topic}"},
+            {"title": f"Wolfram MathWorld - {topic}", "url": f"https://mathworld.wolfram.com/search/?query={topic.replace(' ', '+')}", "type": "Mathematical Reference", "description": f"Comprehensive mathematical encyclopedia for {topic}"},
+            {"title": f"MIT OpenCourseWare - {topic}", "url": f"https://ocw.mit.edu/search/?q={topic.replace(' ', '+')}", "type": "Academic Course", "description": f"MIT mathematics courses covering {topic}"},
+            {"title": f"Paul's Online Math Notes", "url": f"https://tutorial.math.lamar.edu/", "type": "Tutorial", "description": f"Detailed mathematical tutorials including {topic}"}
+        ]
+        
+    else:  # Science or general
+        correct_options = [
+            f"Follow scientific method and evidence-based research for {topic}",
+            f"Use peer-reviewed scientific literature for {topic}",
+            f"Apply established scientific principles for {topic}",
+            f"Rely on empirical evidence and experimentation for {topic}"
+        ]
+        
+        wrong_options = [
+            f"Use unverified claims and opinions for {topic}",
+            f"Ignore scientific evidence for {topic}",
+            f"Rely on pseudoscience for {topic}",
+            f"Use outdated and disproven theories for {topic}",
+            f"Avoid peer review and verification for {topic}",
+            f"Base conclusions on personal beliefs for {topic}"
+        ]
+        
+        references = [
+            {"title": f"PubMed Scientific Literature - {topic}", "url": f"https://pubmed.ncbi.nlm.nih.gov/?term={topic.replace(' ', '+')}", "type": "Scientific Database", "description": f"Peer-reviewed research articles on {topic}"},
+            {"title": f"Khan Academy Science - {topic}", "url": "https://www.khanacademy.org/science", "type": "Educational Platform", "description": f"Science courses covering {topic}"},
+            {"title": f"NASA Science - {topic}", "url": f"https://science.nasa.gov/search/?query={topic.replace(' ', '+')}", "type": "Scientific Institution", "description": f"NASA research and information on {topic}"},
+            {"title": f"National Science Foundation", "url": f"https://www.nsf.gov/discoveries/disc_search.jsp?term={topic.replace(' ', '+')}", "type": "Research Foundation", "description": f"NSF-funded research on {topic}"}
+        ]
+    
+    # Select options
+    correct_option = random.choice(correct_options)
+    selected_wrong = random.sample(wrong_options, 3)
+    
+    options = [correct_option] + selected_wrong
+    correct_idx = 0
+    
+    explanation = f"This answer is correct because it {correct_option.lower()}, which represents the current best practices and standards in {subject} for {topic}."
+    
+    return options, correct_idx, explanation, references
+
+# Replace the main question generation function
+def generate_advanced_ai_questions_with_references(quiz_data):
+    """Main function to generate topic-focused questions with comprehensive references"""
+    return generate_topic_focused_questions(quiz_data)
+
+# Add endpoint to get available topics for a subject
+@app.route('/api/topics/<subject>', methods=['GET'])
+def get_available_topics(subject):
+    """Get available topics for a given subject"""
+    try:
+        subject_lower = subject.lower()
+        
+        # Define available topics per subject
+        topics_by_subject = {
+            'computer science': ['JavaScript Functions', 'Python Functions', 'Object-Oriented Programming', 'Data Structures', 'Algorithms', 'Database Design'],
+            'mathematics': ['Algebra Equations', 'Calculus Derivatives', 'Geometry Theorems', 'Statistics', 'Probability', 'Linear Algebra'],
+            'chemistry': ['Chemical Compounds', 'Chemical Reactions', 'Periodic Table', 'Molecular Structure', 'Thermodynamics', 'Organic Chemistry'],
+            'physics': ['Newton\'s Laws', 'Thermodynamics', 'Electromagnetism', 'Quantum Mechanics', 'Relativity', 'Wave Theory'],
+            'biology': ['Cell Biology', 'Genetics', 'Evolution', 'Ecology', 'Human Anatomy', 'Molecular Biology'],
+            'programming': ['JavaScript Functions', 'Python Functions', 'Java Classes', 'C++ Pointers', 'Web Development', 'Mobile App Development']
+        }
+        
+        # Find matching subject
+        available_topics = []
+        for subject_key, topics in topics_by_subject.items():
+            if subject_key in subject_lower or subject_lower in subject_key:
+                available_topics = topics
+                break
+        
+        if not available_topics:
+            # Default topics based on subject keywords
+            if any(keyword in subject_lower for keyword in ['computer', 'programming', 'software']):
+                available_topics = topics_by_subject['computer science']
+            elif 'math' in subject_lower:
+                available_topics = topics_by_subject['mathematics']
+            elif 'chemistry' in subject_lower or 'chemical' in subject_lower:
+                available_topics = topics_by_subject['chemistry']
+            elif 'physics' in subject_lower:
+                available_topics = topics_by_subject['physics']
+            elif 'biology' in subject_lower or 'bio' in subject_lower:
+                available_topics = topics_by_subject['biology']
+            else:
+                available_topics = ['General Knowledge', 'Critical Thinking', 'Problem Solving']
+        
+        return jsonify({
+            'subject': subject,
+            'available_topics': available_topics,
+            'count': len(available_topics)
+        })
+        
+    except Exception as e:
+        print(f"❌ Get topics error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 def generate_intelligent_questions(quiz_data):
     """Generate intelligent, domain-specific questions with proper resources"""
@@ -782,7 +1008,7 @@ def generate_fallback_questions(quiz_data):
 # Update your main quiz creation endpoint to use the new intelligent system
 def generate_advanced_ai_questions_with_references(quiz_data):
     """Main function to generate advanced AI questions with proper references"""
-    return generate_intelligent_questions(quiz_data)
+    return generate_topic_focused_questions(quiz_data)
 
 def generate_pdf(quiz, questions):
     if not FPDF_AVAILABLE:
