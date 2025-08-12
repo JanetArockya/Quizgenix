@@ -957,7 +957,7 @@ def health_check():
         'status': 'healthy',
         'version': '2.0.0',
         'features': ['Advanced AI Question Generation', 'Knowledge Base Matching', 'Logical Answer Distribution'],
-        'supported_domains': list(KNOWLEDGE_BASE.keys())
+        'supported_domains': list(ENHANCED_KNOWLEDGE_BASE.keys())  # Fixed this line
     })
 
 @app.route('/api/login', methods=['POST'])
@@ -1379,7 +1379,7 @@ def init_db():
 if __name__ == '__main__':
     print("🚀 Starting Quizgenix Advanced AI Backend...")
     print("🤖 AI Features: Smart Knowledge Base, Logical Questions, Diverse Answers")
-    print("🧠 Supported Domains:", list(KNOWLEDGE_BASE.keys()))
+    print("🧠 Supported Domains:", list(ENHANCED_KNOWLEDGE_BASE.keys()))  # Fixed this line
     
     with app.app_context():
         init_db()
