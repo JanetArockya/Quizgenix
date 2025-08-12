@@ -436,44 +436,57 @@ KNOWLEDGE_BASE_WITH_REFERENCES = {
             'questions': [
                 ("What is 7 × 8?", 
                  ["56", "54", "64", "48"], 0,
-                 "7 × 8 = 56 using basic multiplication.",
-                 [
-                     {"title": "Khan Academy - Multiplication", "url": "https://www.khanacademy.org/math/arithmetic/arith-mult-div", "type": "Educational"},
-                     {"title": "Wolfram MathWorld - Multiplication", "url": "https://mathworld.wolfram.com/Multiplication.html", "type": "Reference"},
-                     {"title": "Math is Fun - Multiplication", "url": "https://www.mathsisfun.com/numbers/multiplication.html", "type": "Tutorial"}
-                 ]),
+                 "7 × 8 = 56 using basic multiplication."),
                 ("What is the square root of 16?", 
                  ["4", "8", "2", "6"], 0,
-                 "√16 = 4 because 4 × 4 = 16.",
-                 [
-                     {"title": "Khan Academy - Square roots", "url": "https://www.khanacademy.org/math/algebra-basics/alg-basics-radical-expressions", "type": "Educational"},
-                     {"title": "Wolfram MathWorld - Square Root", "url": "https://mathworld.wolfram.com/SquareRoot.html", "type": "Reference"},
-                     {"title": "Math is Fun - Square Root", "url": "https://www.mathsisfun.com/definitions/square-root.html", "type": "Tutorial"}
-                 ])
+                 "√16 = 4 because 4 × 4 = 16."),
+                ("What is 25% of 100?", 
+                 ["25", "75", "50", "20"], 0,
+                 "25% of 100 = 25/100 × 100 = 25."),
+                ("What is the perimeter of a square with side 5?", 
+                 ["20", "25", "10", "15"], 0,
+                 "Perimeter of square = 4 × side length = 4 × 5 = 20."),
+                ("What is 15 - 7?", 
+                 ["8", "9", "7", "22"], 0,
+                 "15 - 7 = 8 using basic subtraction.")
             ]
         },
         'medium': {
             'questions': [
                 ("What is the derivative of x²?", 
                  ["2x", "x", "2x²", "x²"], 0,
-                 "Using the power rule: d/dx(x²) = 2x¹ = 2x.",
-                 [
-                     {"title": "Khan Academy - Power rule", "url": "https://www.khanacademy.org/math/ap-calculus-ab/ab-differentiation-1-new/ab-2-1/a/power-rule-review", "type": "Educational"},
-                     {"title": "Wolfram MathWorld - Power Rule", "url": "https://mathworld.wolfram.com/PowerRule.html", "type": "Reference"},
-                     {"title": "MIT OpenCourseWare - Derivatives", "url": "https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/", "type": "Academic"}
-                 ])
+                 "Using the power rule: d/dx(x²) = 2x¹ = 2x."),
+                ("What is the area of a circle with radius 3?", 
+                 ["9π", "6π", "3π", "12π"], 0,
+                 "Area = πr² = π × 3² = 9π."),
+                ("Solve for x: 2x + 5 = 15", 
+                 ["x = 5", "x = 10", "x = 7.5", "x = 20"], 0,
+                 "2x + 5 = 15 → 2x = 10 → x = 5."),
+                ("What is sin(90°)?", 
+                 ["1", "0", "1/2", "√3/2"], 0,
+                 "sin(90°) = 1 in the unit circle."),
+                ("What is log₁₀(100)?", 
+                 ["2", "10", "100", "1"], 0,
+                 "log₁₀(100) = 2 because 10² = 100.")
             ]
         },
         'hard': {
             'questions': [
                 ("What is the integral of e^x?", 
                  ["e^x + C", "xe^x + C", "e^x/x + C", "x·e^x + C"], 0,
-                 "The integral of e^x is e^x + C because d/dx(e^x) = e^x.",
-                 [
-                     {"title": "Khan Academy - Integration of e^x", "url": "https://www.khanacademy.org/math/ap-calculus-ab/ab-integration-new/ab-6-8/a/integrating-exponential-functions-review", "type": "Educational"},
-                     {"title": "Wolfram MathWorld - Exponential Function", "url": "https://mathworld.wolfram.com/ExponentialFunction.html", "type": "Reference"},
-                     {"title": "MIT OpenCourseWare - Integration", "url": "https://ocw.mit.edu/courses/mathematics/18-01sc-single-variable-calculus-fall-2010/", "type": "Academic"}
-                 ])
+                 "The integral of e^x is e^x + C because d/dx(e^x) = e^x."),
+                ("What is the limit of sin(x)/x as x approaches 0?", 
+                 ["1", "0", "∞", "undefined"], 0,
+                 "This is a fundamental limit: lim(x→0) sin(x)/x = 1."),
+                ("What is the determinant of [[2,3],[1,4]]?", 
+                 ["5", "8", "-1", "11"], 0,
+                 "det([[2,3],[1,4]]) = 2×4 - 3×1 = 8 - 3 = 5."),
+                ("What is the Taylor series of e^x around x=0?", 
+                 ["∑(x^n/n!) for n=0 to ∞", "∑(x^n) for n=0 to ∞", "∑(n·x^n) for n=0 to ∞", "∑(x^n/n) for n=1 to ∞"], 0,
+                 "The Taylor series of e^x is ∑(x^n/n!) = 1 + x + x²/2! + x³/3! + ..."),
+                ("What is the eigenvalue equation?", 
+                 ["Av = λv", "A + v = λv", "Av = λ", "A = λv"], 0,
+                 "The eigenvalue equation is Av = λv where A is the matrix, v is eigenvector, λ is eigenvalue.")
             ]
         }
     },
@@ -482,20 +495,19 @@ KNOWLEDGE_BASE_WITH_REFERENCES = {
             'questions': [
                 ("What is the chemical symbol for water?", 
                  ["H₂O", "CO₂", "NaCl", "O₂"], 0,
-                 "Water consists of 2 hydrogen atoms and 1 oxygen atom: H₂O.",
-                 [
-                     {"title": "IUPAC - Water", "url": "https://iupac.org/what-we-do/nomenclature/", "type": "Official Standards"},
-                     {"title": "Khan Academy - Chemical formulas", "url": "https://www.khanacademy.org/science/chemistry/atomic-structure-and-properties/introduction-to-compounds/a/chemical-formulas", "type": "Educational"},
-                     {"title": "NIST Chemistry WebBook", "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7732185", "type": "Scientific Database"}
-                 ]),
+                 "Water consists of 2 hydrogen atoms and 1 oxygen atom: H₂O."),
                 ("What is the speed of light?", 
                  ["3×10⁸ m/s", "3×10⁶ m/s", "3×10¹⁰ m/s", "3×10⁴ m/s"], 0,
-                 "The speed of light in vacuum is approximately 3×10⁸ meters per second.",
-                 [
-                     {"title": "NIST - Speed of Light", "url": "https://physics.nist.gov/cgi-bin/cuu/Value?c", "type": "Official Standards"},
-                     {"title": "Physics.org - Speed of Light", "url": "https://physics.org/speed-of-light.asp", "type": "Reference"},
-                     {"title": "Khan Academy - Special Relativity", "url": "https://www.khanacademy.org/science/physics/special-relativity", "type": "Educational"}
-                 ])
+                 "The speed of light in vacuum is approximately 3×10⁸ meters per second."),
+                ("What is the powerhouse of the cell?", 
+                 ["Mitochondria", "Nucleus", "Ribosome", "Chloroplast"], 0,
+                 "Mitochondria produce ATP, the cell's energy currency."),
+                ("What gas do plants absorb during photosynthesis?", 
+                 ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"], 0,
+                 "Plants absorb CO₂ and release oxygen during photosynthesis."),
+                ("What is the atomic number of carbon?", 
+                 ["6", "12", "14", "8"], 0,
+                 "Carbon has 6 protons, making its atomic number 6.")
             ]
         },
         'medium': {
@@ -678,70 +690,54 @@ def generate_contextual_question(topic, subject, difficulty, question_num):
     return (question_text, options, correct_answer, explanation)
 
 def generate_advanced_ai_questions_with_references(quiz_data):
-    """Generate diverse, logical questions with authoritative references"""
+    """Generate diverse, unique questions with authoritative references"""
     questions = []
     count = int(quiz_data.get('questionCount', 5))
     topic = quiz_data.get('topic', '').lower().strip()
     difficulty = quiz_data.get('difficulty', 'medium').lower()
     subject = quiz_data.get('subject', '').lower().strip()
     
-    print(f"🤖 Generating verified questions with references for: {topic} in {subject} ({difficulty})")
+    print(f"🤖 Generating {count} unique questions for: {topic} in {subject} ({difficulty})")
     
     # Determine the best knowledge domain
-    domain_key = None
+    domain_key = determine_domain(topic, subject)
     
-    if any(keyword in topic for keyword in ['javascript', 'js', 'programming', 'coding', 'function', 'variable', 'array']):
-        domain_key = 'javascript'
-    elif any(keyword in topic for keyword in ['python', 'django', 'flask', 'list', 'dictionary', 'class']):
-        domain_key = 'python'
-    elif any(keyword in topic for keyword in ['math', 'algebra', 'calculus', 'geometry', 'equation', 'derivative', 'integral']):
-        domain_key = 'mathematics'
-    elif any(keyword in topic for keyword in ['chemistry', 'physics', 'biology', 'science', 'cell', 'atom', 'molecule']):
-        domain_key = 'science'
-    elif any(keyword in subject for keyword in ['computer', 'programming', 'software']):
-        domain_key = 'javascript'
-    elif any(keyword in subject for keyword in ['math', 'mathematics']):
-        domain_key = 'mathematics'
-    elif any(keyword in subject for keyword in ['science', 'chemistry', 'physics', 'biology']):
-        domain_key = 'science'
-    else:
-        domain_key = 'science'
+    # Create diverse question templates for each topic
+    question_templates = get_diverse_question_templates(topic, subject, difficulty)
     
-    # Get questions from enhanced knowledge base with references
-    if domain_key and domain_key in KNOWLEDGE_BASE_WITH_REFERENCES and difficulty in KNOWLEDGE_BASE_WITH_REFERENCES[domain_key]:
-        knowledge_questions = KNOWLEDGE_BASE_WITH_REFERENCES[domain_key][difficulty]['questions']
+    # Generate unique questions using different templates
+    used_templates = set()
+    used_concepts = set()
+    
+    for i in range(count):
+        # Ensure we don't repeat question types
+        available_templates = [t for t in question_templates if t['id'] not in used_templates]
+        if not available_templates:
+            # Reset if we've used all templates
+            used_templates.clear()
+            available_templates = question_templates
         
-        if len(knowledge_questions) >= count:
-            selected_questions = random.sample(knowledge_questions, count)
-        else:
-            selected_questions = knowledge_questions[:]
-            remaining = count - len(selected_questions)
-            
-            # Generate additional questions with references
-            for i in range(remaining):
-                additional_q = generate_contextual_question_with_references(topic, subject, difficulty, i + len(selected_questions) + 1)
-                selected_questions.append(additional_q)
-    else:
-        selected_questions = []
-        for i in range(count):
-            question = generate_contextual_question_with_references(topic, subject, difficulty, i + 1)
-            selected_questions.append(question)
-    
-    # Convert to our format with references
-    for i, q_data in enumerate(selected_questions):
-        if isinstance(q_data, tuple) and len(q_data) >= 5:
-            question_text, options, correct_idx, explanation, references = q_data[0], q_data[1], q_data[2], q_data[3], q_data[4]
-        else:
-            question_text, options, correct_idx, explanation = q_data[:4]
-            references = generate_default_references(topic, subject, domain_key)
+        # Select a unique template
+        template = random.choice(available_templates)
+        used_templates.add(template['id'])
         
-        # Randomize correct answer position for better learning
+        # Generate question with specific concept focus
+        concept = generate_unique_concept(topic, subject, used_concepts, i)
+        used_concepts.add(concept)
+        
+        question_data = generate_contextual_question_with_template(
+            topic, subject, difficulty, template, concept, i + 1
+        )
+        
+        # Randomize correct answer position
+        question_text, options, correct_idx, explanation, references = question_data
         randomized_correct_idx = random.randint(0, 3)
         randomized_options = options[:]
         
         # Swap correct answer to new position
         if randomized_correct_idx != correct_idx:
-            randomized_options[randomized_correct_idx], randomized_options[correct_idx] = randomized_options[correct_idx], randomized_options[randomized_correct_idx]
+            randomized_options[randomized_correct_idx], randomized_options[correct_idx] = \
+                randomized_options[correct_idx], randomized_options[randomized_correct_idx]
         
         question = {
             'id': i + 1,
@@ -754,105 +750,350 @@ def generate_advanced_ai_questions_with_references(quiz_data):
             'verified': True,
             'difficulty': difficulty,
             'topic': topic,
-            'domain': domain_key
+            'concept': concept,
+            'template_used': template['id']
         }
         questions.append(question)
     
-    print(f"✅ Generated {len(questions)} verified questions with references for {topic}")
+    print(f"✅ Generated {len(questions)} unique questions with diverse concepts")
     return questions
 
-def generate_contextual_question_with_references(topic, subject, difficulty, question_num):
-    """Generate contextual questions with appropriate references"""
+def determine_domain(topic, subject):
+    """Determine the knowledge domain based on topic and subject"""
+    topic_lower = topic.lower()
+    subject_lower = subject.lower()
     
-    templates = {
-        'easy': [
-            f"What is the basic definition of {topic}?",
-            f"Which of the following best describes {topic}?",
-            f"What is a key characteristic of {topic}?",
-            f"In {subject}, {topic} is primarily used for:",
-            f"What is the main purpose of {topic}?"
-        ],
-        'medium': [
-            f"How does {topic} work in practical applications?",
-            f"What are the advantages of using {topic}?",
-            f"How does {topic} relate to other concepts in {subject}?",
-            f"What is the best approach when implementing {topic}?",
-            f"What problems does {topic} solve in {subject}?"
-        ],
-        'hard': [
-            f"What are the theoretical foundations of {topic}?",
-            f"How would you optimize {topic} for complex scenarios?",
-            f"What are the limitations and trade-offs of {topic}?",
-            f"How does {topic} integrate with advanced {subject} concepts?",
-            f"What are the cutting-edge developments in {topic}?"
-        ]
-    }
+    # JavaScript/Programming keywords
+    js_keywords = ['javascript', 'js', 'function', 'variable', 'array', 'object', 'dom', 'api', 'async', 'promise']
+    # Python keywords  
+    python_keywords = ['python', 'django', 'flask', 'list', 'dictionary', 'class', 'module', 'pip', 'pandas']
+    # Math keywords
+    math_keywords = ['algebra', 'calculus', 'geometry', 'trigonometry', 'equation', 'derivative', 'integral', 'matrix']
+    # Science keywords
+    science_keywords = ['chemistry', 'physics', 'biology', 'cell', 'atom', 'molecule', 'energy', 'force', 'genetics']
     
-    question_templates = templates.get(difficulty, templates['medium'])
-    question_text = question_templates[(question_num - 1) % len(question_templates)]
+    if any(keyword in topic_lower or keyword in subject_lower for keyword in js_keywords):
+        return 'javascript'
+    elif any(keyword in topic_lower or keyword in subject_lower for keyword in python_keywords):
+        return 'python'
+    elif any(keyword in topic_lower or keyword in subject_lower for keyword in math_keywords):
+        return 'mathematics'
+    elif any(keyword in topic_lower or keyword in subject_lower for keyword in science_keywords):
+        return 'science'
+    elif 'computer' in subject_lower or 'programming' in subject_lower:
+        return 'javascript'
+    elif 'math' in subject_lower:
+        return 'mathematics'
+    else:
+        return 'science'
+
+def get_diverse_question_templates(topic, subject, difficulty):
+    """Get diverse question templates to avoid repetition"""
     
-    # Generate contextual options
-    if 'programming' in subject.lower() or 'computer' in subject.lower():
-        options = [
-            f"It provides efficient solutions for {topic}-related problems",
-            f"It is an outdated approach to handling {topic}",
-            f"It only works in specific programming languages",
-            f"It has no practical applications in modern development"
+    base_templates = [
+        {'id': 'definition', 'type': 'What is', 'focus': 'basic understanding'},
+        {'id': 'application', 'type': 'How to use', 'focus': 'practical application'},
+        {'id': 'comparison', 'type': 'Compare/contrast', 'focus': 'relationship analysis'},
+        {'id': 'problem_solving', 'type': 'Problem solving', 'focus': 'solution approach'},
+        {'id': 'best_practice', 'type': 'Best practice', 'focus': 'optimal approach'},
+        {'id': 'troubleshooting', 'type': 'Troubleshooting', 'focus': 'error handling'},
+        {'id': 'implementation', 'type': 'Implementation', 'focus': 'coding/application'},
+        {'id': 'theory', 'type': 'Theoretical', 'focus': 'conceptual understanding'}
+    ]
+    
+    # Adjust templates based on difficulty
+    if difficulty == 'easy':
+        return [t for t in base_templates if t['id'] in ['definition', 'application', 'best_practice']]
+    elif difficulty == 'medium':
+        return [t for t in base_templates if t['id'] in ['application', 'comparison', 'problem_solving', 'implementation']]
+    else:  # hard
+        return [t for t in base_templates if t['id'] in ['problem_solving', 'troubleshooting', 'theory', 'implementation']]
+
+def generate_unique_concept(topic, subject, used_concepts, question_number):
+    """Generate unique concept variations to avoid repetition"""
+    
+    base_topic = topic.lower()
+    
+    # Create concept variations based on domain
+    if 'javascript' in subject.lower() or 'programming' in subject.lower():
+        concepts = [
+            f"{base_topic} syntax",
+            f"{base_topic} best practices", 
+            f"{base_topic} performance",
+            f"{base_topic} debugging",
+            f"{base_topic} implementation",
+            f"{base_topic} optimization",
+            f"{base_topic} error handling",
+            f"{base_topic} integration"
         ]
     elif 'math' in subject.lower():
-        options = [
-            f"It follows fundamental mathematical principles for {topic}",
-            f"It contradicts basic mathematical rules",
-            f"It only applies to theoretical mathematics",
-            f"It is used exclusively in advanced calculus"
+        concepts = [
+            f"{base_topic} fundamentals",
+            f"{base_topic} applications",
+            f"{base_topic} problem solving",
+            f"{base_topic} theorems",
+            f"{base_topic} proofs",
+            f"{base_topic} calculations",
+            f"{base_topic} formulas",
+            f"{base_topic} real-world usage"
         ]
     else:
-        options = [
-            f"It represents current scientific understanding of {topic}",
-            f"It is based on disproven theories about {topic}",
-            f"It only applies in laboratory conditions",
-            f"It has no connection to real-world phenomena"
+        concepts = [
+            f"{base_topic} principles",
+            f"{base_topic} applications",
+            f"{base_topic} methodology",
+            f"{base_topic} analysis",
+            f"{base_topic} implementation",
+            f"{base_topic} evaluation",
+            f"{base_topic} optimization",
+            f"{base_topic} integration"
         ]
     
+    # Return unused concept or create new one
+    available_concepts = [c for c in concepts if c not in used_concepts]
+    if available_concepts:
+        return random.choice(available_concepts)
+    else:
+        return f"{base_topic} aspect {question_number}"
+
+def generate_contextual_question_with_template(topic, subject, difficulty, template, concept, question_num):
+    """Generate unique questions using templates and concepts"""
+    
+    # Create diverse question stems based on template type
+    if template['id'] == 'definition':
+        question_stems = [
+            f"What is the primary purpose of {concept}?",
+            f"How would you define {concept}?",
+            f"What characterizes {concept}?",
+            f"Which statement best describes {concept}?"
+        ]
+    elif template['id'] == 'application':
+        question_stems = [
+            f"When implementing {concept}, what is the recommended approach?",
+            f"How should {concept} be applied in practical scenarios?",
+            f"What is the best way to utilize {concept}?",
+            f"In which situation would you use {concept}?"
+        ]
+    elif template['id'] == 'comparison':
+        question_stems = [
+            f"How does {concept} compare to alternative approaches?",
+            f"What advantage does {concept} provide over other methods?",
+            f"When choosing between options, why select {concept}?",
+            f"What makes {concept} different from similar concepts?"
+        ]
+    elif template['id'] == 'problem_solving':
+        question_stems = [
+            f"When facing challenges with {concept}, what should you do?",
+            f"How do you solve problems related to {concept}?",
+            f"What approach works best for {concept} issues?",
+            f"If {concept} isn't working as expected, what's the solution?"
+        ]
+    elif template['id'] == 'best_practice':
+        question_stems = [
+            f"What is considered best practice for {concept}?",
+            f"Which approach is recommended when working with {concept}?",
+            f"What guidelines should be followed for {concept}?",
+            f"How should professionals handle {concept}?"
+        ]
+    elif template['id'] == 'troubleshooting':
+        question_stems = [
+            f"When {concept} produces unexpected results, what's the likely cause?",
+            f"How do you debug issues with {concept}?",
+            f"What's the first step in troubleshooting {concept}?",
+            f"Common problems with {concept} are usually caused by what?"
+        ]
+    elif template['id'] == 'implementation':
+        question_stems = [
+            f"The correct way to implement {concept} involves which step?",
+            f"When setting up {concept}, what is essential?",
+            f"What must be considered during {concept} implementation?",
+            f"Which factor is most important for successful {concept}?"
+        ]
+    else:  # theory
+        question_stems = [
+            f"The theoretical foundation of {concept} is based on what?",
+            f"What principle underlies {concept}?",
+            f"From a theoretical perspective, {concept} represents what?",
+            f"The conceptual basis for {concept} comes from which idea?"
+        ]
+    
+    # Select question stem
+    question_text = random.choice(question_stems)
+    
+    # Generate diverse, contextual options
+    options = generate_diverse_options(topic, subject, concept, template, difficulty)
+    
+    # Always put correct answer first, then randomize later
     correct_answer = 0
-    explanation = f"This answer correctly explains {topic} because it aligns with established principles in {subject} and reflects current understanding in the field."
+    
+    # Generate contextual explanation
+    explanation = generate_contextual_explanation(concept, subject, template)
     
     # Generate appropriate references
-    references = generate_default_references(topic, subject, 'general')
+    references = generate_domain_specific_references(topic, subject, concept)
     
     return (question_text, options, correct_answer, explanation, references)
 
-def generate_default_references(topic, subject, domain):
-    """Generate appropriate references based on domain"""
+def generate_diverse_options(topic, subject, concept, template, difficulty):
+    """Generate diverse answer options based on context"""
     
-    references = []
+    domain = determine_domain(topic, subject)
     
-    if domain == 'javascript' or 'programming' in subject.lower():
-        references = [
-            {"title": f"MDN Web Docs - {topic}", "url": f"https://developer.mozilla.org/en-US/search?q={topic.replace(' ', '+')}", "type": "Official Documentation"},
-            {"title": f"JavaScript.info - {topic}", "url": f"https://javascript.info/?s={topic.replace(' ', '+')}", "type": "Tutorial"},
-            {"title": f"Stack Overflow - {topic}", "url": f"https://stackoverflow.com/search?q={topic.replace(' ', '+')}", "type": "Community"}
+    if domain == 'javascript':
+        if template['id'] == 'best_practice':
+            return [
+                f"Follow established coding standards and use appropriate design patterns for {concept}",
+                f"Ignore performance considerations and focus only on functionality",
+                f"Use deprecated methods for backward compatibility",
+                f"Avoid documentation and code comments to keep it simple"
+            ]
+        elif template['id'] == 'problem_solving':
+            return [
+                f"Analyze the issue systematically and apply debugging techniques for {concept}",
+                f"Randomly try different approaches until something works",
+                f"Copy solutions from online without understanding the logic",
+                f"Ignore error messages and continue with implementation"
+            ]
+        else:
+            return [
+                f"It provides efficient and scalable solutions for {concept}",
+                f"It creates unnecessary complexity in the codebase",
+                f"It only works in specific browser environments",
+                f"It has been deprecated and should not be used"
+            ]
+            
+    elif domain == 'mathematics':
+        if template['id'] == 'application':
+            return [
+                f"Apply the fundamental mathematical principles correctly for {concept}",
+                f"Use approximations even when exact solutions are possible",
+                f"Ignore mathematical rules and rely on intuition",
+                f"Only use basic arithmetic regardless of complexity"
+            ]
+        elif template['id'] == 'problem_solving':
+            return [
+                f"Break down the problem systematically and apply appropriate formulas for {concept}",
+                f"Guess the answer based on similar-looking problems",
+                f"Use only mental math without showing work",
+                f"Skip steps to reach the conclusion faster"
+            ]
+        else:
+            return [
+                f"It follows proven mathematical principles and provides reliable results for {concept}",
+                f"It contradicts established mathematical theorems",
+                f"It only applies to theoretical situations with no practical use",
+                f"It requires advanced mathematics that most people can't understand"
+            ]
+            
+    else:  # science or general
+        if template['id'] == 'methodology':
+            return [
+                f"Use evidence-based approaches and follow scientific methodology for {concept}",
+                f"Rely on personal opinions rather than empirical evidence",
+                f"Skip the hypothesis stage and jump to conclusions",
+                f"Avoid peer review and independent verification"
+            ]
+        else:
+            return [
+                f"It represents current scientific understanding and evidence-based knowledge of {concept}",
+                f"It contradicts well-established scientific principles",
+                f"It only applies in controlled laboratory conditions",
+                f"It has no basis in scientific research or evidence"
+            ]
+
+def generate_contextual_explanation(concept, subject, template):
+    """Generate contextual explanations based on concept and template"""
+    
+    explanations = {
+        'definition': f"This answer correctly defines {concept} according to established standards in {subject}.",
+        'application': f"This approach represents the proper application of {concept} in {subject} contexts.",
+        'comparison': f"This option accurately compares {concept} with alternatives in {subject}.",
+        'problem_solving': f"This solution follows proven problem-solving methodologies for {concept} in {subject}.",
+        'best_practice': f"This represents industry best practices and standards for {concept} in {subject}.",
+        'troubleshooting': f"This approach follows systematic troubleshooting procedures for {concept} in {subject}.",
+        'implementation': f"This method ensures proper implementation of {concept} according to {subject} principles.",
+        'theory': f"This answer reflects the theoretical foundations of {concept} in {subject}."
+    }
+    
+    return explanations.get(template['id'], f"This answer correctly explains {concept} in the context of {subject}.")
+
+def generate_domain_specific_references(topic, subject, concept):
+    """Generate domain-specific references for verification"""
+    
+    domain = determine_domain(topic, subject)
+    
+    if domain == 'javascript':
+        return [
+            {
+                "title": f"MDN Web Docs - {concept}",
+                "url": f"https://developer.mozilla.org/en-US/search?q={concept.replace(' ', '+')}", 
+                "type": "Official Documentation"
+            },
+            {
+                "title": f"JavaScript.info - {concept}",
+                "url": f"https://javascript.info/?s={concept.replace(' ', '+')}", 
+                "type": "Educational Resource"
+            },
+            {
+                "title": f"W3Schools - {concept}",
+                "url": f"https://www.w3schools.com/js/", 
+                "type": "Tutorial"
+            }
         ]
     elif domain == 'python':
-        references = [
-            {"title": f"Python.org - {topic}", "url": f"https://docs.python.org/3/search.html?q={topic.replace(' ', '+')}", "type": "Official Documentation"},
-            {"title": f"Real Python - {topic}", "url": f"https://realpython.com/search/?q={topic.replace(' ', '+')}", "type": "Tutorial"},
-            {"title": f"PEP Index - {topic}", "url": f"https://www.python.org/dev/peps/", "type": "PEP Documents"}
+        return [
+            {
+                "title": f"Python Documentation - {concept}",
+                "url": f"https://docs.python.org/3/search.html?q={concept.replace(' ', '+')}", 
+                "type": "Official Documentation"
+            },
+            {
+                "title": f"Real Python - {concept}",
+                "url": f"https://realpython.com/search/?q={concept.replace(' ', '+')}", 
+                "type": "Tutorial"
+            },
+            {
+                "title": f"Python Package Index - {concept}",
+                "url": f"https://pypi.org/search/?q={concept.replace(' ', '+')}", 
+                "type": "Package Repository"
+            }
         ]
     elif domain == 'mathematics':
-        references = [
-            {"title": f"Khan Academy - {topic}", "url": f"https://www.khanacademy.org/search?page_search_query={topic.replace(' ', '+')}", "type": "Educational"},
-            {"title": f"Wolfram MathWorld - {topic}", "url": f"https://mathworld.wolfram.com/search/?query={topic.replace(' ', '+')}", "type": "Reference"},
-            {"title": f"MIT OpenCourseWare - {topic}", "url": f"https://ocw.mit.edu/search/?q={topic.replace(' ', '+')}", "type": "Academic"}
+        return [
+            {
+                "title": f"Khan Academy - {concept}",
+                "url": f"https://www.khanacademy.org/search?page_search_query={concept.replace(' ', '+')}", 
+                "type": "Educational"
+            },
+            {
+                "title": f"Wolfram MathWorld - {concept}",
+                "url": f"https://mathworld.wolfram.com/search/?query={concept.replace(' ', '+')}", 
+                "type": "Mathematical Reference"
+            },
+            {
+                "title": f"MIT OpenCourseWare - {concept}",
+                "url": f"https://ocw.mit.edu/search/?q={concept.replace(' ', '+')}", 
+                "type": "Academic Course"
+            }
         ]
     else:  # science
-        references = [
-            {"title": f"Khan Academy - {topic}", "url": f"https://www.khanacademy.org/search?page_search_query={topic.replace(' ', '+')}", "type": "Educational"},
-            {"title": f"NASA - {topic}", "url": f"https://www.nasa.gov/search/site/{topic.replace(' ', '+')}", "type": "Scientific Institution"},
-            {"title": f"National Science Foundation - {topic}", "url": f"https://www.nsf.gov/search/?q={topic.replace(' ', '+')}", "type": "Research"}
+        return [
+            {
+                "title": f"Scientific Research - {concept}",
+                "url": f"https://scholar.google.com/scholar?q={concept.replace(' ', '+')}", 
+                "type": "Academic Research"
+            },
+            {
+                "title": f"Khan Academy Science - {concept}",
+                "url": f"https://www.khanacademy.org/science/", 
+                "type": "Educational"
+            },
+            {
+                "title": f"NASA Education - {concept}",
+                "url": f"https://www.nasa.gov/search/site/{concept.replace(' ', '+')}", 
+                "type": "Scientific Institution"
+            }
         ]
-    
-    return references
 
 # Add download functions
 def generate_pdf(quiz, questions):
@@ -1233,6 +1474,7 @@ def submit_answer(session_token):
         
         # Update session with answer
         current_answers = json.loads(session.answers_so_far)
+
         current_answers[str(question_id)] = selected_answer
         
         session.answers_so_far = json.dumps(current_answers)
