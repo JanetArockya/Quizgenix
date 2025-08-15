@@ -119,6 +119,20 @@ TOPIC_FOCUSED_KNOWLEDGE_BASE = {
                     {"title": "MDN - Calling Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#calling_functions", "type": "Official Documentation", "description": "Detailed explanation of how to call functions in JavaScript"},
                     {"title": "JavaScript Function Invocation", "url": "https://javascript.info/function-basics#function-calling", "type": "Tutorial", "description": "Learn different ways to invoke JavaScript functions"}
                 ]
+            },
+            {
+                'question': "Which keyword is used to declare a function in JavaScript?",
+                'options': [
+                    "function",
+                    "def",
+                    "func",
+                    "declare"
+                ],
+                'correct': 0,
+                'explanation': "The 'function' keyword is used to declare functions in JavaScript.",
+                'references': [
+                    {"title": "MDN - Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions", "type": "Official Documentation", "description": "Comprehensive guide to JavaScript functions."}
+                ]
             }
         ],
         'medium': [
@@ -136,6 +150,40 @@ TOPIC_FOCUSED_KNOWLEDGE_BASE = {
                     {"title": "MDN - Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures", "type": "Official Documentation", "description": "Comprehensive guide to understanding JavaScript closures"},
                     {"title": "JavaScript Closures Explained", "url": "https://javascript.info/closure", "type": "Tutorial", "description": "Step-by-step explanation of closures with examples"},
                     {"title": "You Don't Know JS - Closures", "url": "https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures", "type": "Advanced Reference", "description": "Deep dive into JavaScript closures and scope"}
+                ]
+            },
+            {
+                'question': "What is the difference between '==' and '===' in JavaScript?",
+                'options': [
+                    "'==' checks value and type, '===' checks value only",
+                    "'==' checks value only, '===' checks value and type",
+                    "'==' is used for assignment, '===' is used for comparison",
+                    "There is no difference, they are interchangeable"
+                ],
+                'correct': 1,
+                'explanation': "In JavaScript, '==' is the equality operator that checks for value equality with type coercion, while '===' is the strict equality operator that checks for both value and type equality without coercion.",
+                'references': [
+                    {"title": "MDN - Equality Operators", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality", "type": "Official Documentation", "description": "Detailed explanation of '==' and '===' operators in JavaScript"},
+                    {"title": "JavaScript.info - Equality", "url": "https://javascript.info/strict-equal", "type": "Tutorial", "description": "Learn about equality and inequality in JavaScript"},
+                    {"title": "W3Schools - JavaScript Comparison Operators", "url": "https://www.w3schools.com/js/js_comparisons.asp", "type": "Learning Resource", "description": "Examples and explanations of JavaScript comparison operators"}
+                ]
+            }
+        ],
+        'hard': [
+            {
+                'question': "How does the 'this' keyword work in JavaScript functions?",
+                'options': [
+                    "It refers to the global object in all cases",
+                    "It refers to the object that is currently executing the function",
+                    "It is a keyword for defining constants in functions",
+                    "It has no special meaning, just a regular variable"
+                ],
+                'correct': 1,
+                'explanation': "The 'this' keyword in JavaScript functions refers to the object that is currently executing the function. Its value depends on how the function is called.",
+                'references': [
+                    {"title": "MDN - this", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this", "type": "Official Documentation", "description": "In-depth explanation of the 'this' keyword in JavaScript"},
+                    {"title": "JavaScript.info - Object Prototypes", "url": "https://javascript.info/propotypes", "type": "Tutorial", "description": "Understanding 'this' in the context of object prototypes"},
+                    {"title": "You Don't Know JS - this & Object Prototypes", "url": "https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/this%20&%20object%20prototypes.md", "type": "Advanced Reference", "description": "Detailed exploration of 'this' and object prototypes in JavaScript"}
                 ]
             }
         ]
@@ -764,8 +812,8 @@ def get_relevant_questions(domain, difficulty, subtopic, topic):
     question_pool = []
     
     # Get questions from the specific domain and difficulty
-    if domain in ENHANCED_KNOWLEDGE_BASE and difficulty in ENHANCED_KNOWLEDGE_BASE[domain]:
-        difficulty_data = ENHANCED_KNOWLEDGE_BASE[domain][difficulty]
+    if domain in TOPIC_FOCUSED_KNOWLEDGE_BASE and difficulty in TOPIC_FOCUSED_KNOWLEDGE_BASE[domain]:  # Fixed this line
+        difficulty_data = TOPIC_FOCUSED_KNOWLEDGE_BASE[domain][difficulty]  # Fixed this line
         
         # First, try to get questions from the specific subtopic
         if subtopic in difficulty_data:
@@ -1183,7 +1231,7 @@ def health_check():
         'status': 'healthy',
         'version': '2.0.0',
         'features': ['Advanced AI Question Generation', 'Knowledge Base Matching', 'Logical Answer Distribution'],
-        'supported_domains': list(ENHANCED_KNOWLEDGE_BASE.keys())  # Fixed this line
+        'supported_domains': list(TOPIC_FOCUSED_KNOWLEDGE_BASE.keys())  # Fixed this line
     })
 
 @app.route('/api/login', methods=['POST'])
@@ -1605,7 +1653,7 @@ def init_db():
 if __name__ == '__main__':
     print("🚀 Starting Quizgenix Advanced AI Backend...")
     print("🤖 AI Features: Smart Knowledge Base, Logical Questions, Diverse Answers")
-    print("🧠 Supported Domains:", list(ENHANCED_KNOWLEDGE_BASE.keys()))  # Fixed this line
+    print("🧠 Supported Domains:", list(TOPIC_FOCUSED_KNOWLEDGE_BASE.keys()))  # Fixed this line
     
     with app.app_context():
         init_db()
