@@ -90,200 +90,38 @@ TOPIC_FOCUSED_KNOWLEDGE_BASE = {
     'javascript_functions': {
         'easy': [
             {
-                'question': "What is the correct syntax to declare a function named 'calculateSum' in JavaScript?",
-                'options': [
-                    "function calculateSum() { }",
-                    "def calculateSum() { }",
-                    "function: calculateSum() { }",
-                    "create function calculateSum() { }"
-                ],
-                'correct': 0,
-                'explanation': "JavaScript functions are declared using the 'function' keyword followed by the function name and parentheses. This is the standard ES5 function declaration syntax.",
-                'references': [
-                    {"title": "MDN - Function Declarations", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions", "type": "Official Documentation", "description": "Complete guide to JavaScript functions including declaration syntax"},
-                    {"title": "JavaScript.info - Function Basics", "url": "https://javascript.info/function-basics", "type": "Tutorial", "description": "Interactive tutorial on JavaScript function fundamentals"},
-                    {"title": "W3Schools - JavaScript Functions", "url": "https://www.w3schools.com/js/js_functions.asp", "type": "Learning Resource", "description": "Beginner-friendly examples of JavaScript function usage"}
-                ]
-            },
-            {
-                'question': "How do you call a function named 'greetUser' with a parameter 'name'?",
-                'options': [
-                    "greetUser(name);",
-                    "call greetUser(name);",
-                    "invoke greetUser(name);",
-                    "execute greetUser(name);"
-                ],
-                'correct': 0,
-                'explanation': "In JavaScript, functions are called by using the function name followed by parentheses containing arguments. This is the standard function invocation syntax.",
-                'references': [
-                    {"title": "MDN - Calling Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#calling_functions", "type": "Official Documentation", "description": "Detailed explanation of how to call functions in JavaScript"},
-                    {"title": "JavaScript Function Invocation", "url": "https://javascript.info/function-basics#function-calling", "type": "Tutorial", "description": "Learn different ways to invoke JavaScript functions"}
-                ]
-            },
-            {
                 'question': "Which keyword is used to declare a function in JavaScript?",
                 'options': [
                     "function",
                     "def",
-                    "func",
-                    "declare"
+                    "lambda",
+                    "sub"
                 ],
                 'correct': 0,
-                'explanation': "The 'function' keyword is used to declare functions in JavaScript.",
+                'explanation': "The 'function' keyword is used in JavaScript to declare functions.",
                 'references': [
-                    {"title": "MDN - Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions", "type": "Official Documentation", "description": "Comprehensive guide to JavaScript functions."}
-                ]
-            }
-        ],
-        'medium': [
-            {
-                'question': "What is a JavaScript closure and how does it work with functions?",
-                'options': [
-                    "A closure gives access to outer function's variables from inner function even after outer function returns",
-                    "A closure is a way to hide functions from global scope",
-                    "A closure is a method to combine multiple functions into one",
-                    "A closure is a JavaScript error that occurs when functions overlap"
-                ],
-                'correct': 0,
-                'explanation': "A closure in JavaScript is created when an inner function has access to variables from its outer (enclosing) function's scope even after the outer function has returned. This is fundamental to JavaScript's scope chain.",
-                'references': [
-                    {"title": "MDN - Closures", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures", "type": "Official Documentation", "description": "Comprehensive guide to understanding JavaScript closures"},
-                    {"title": "JavaScript Closures Explained", "url": "https://javascript.info/closure", "type": "Tutorial", "description": "Step-by-step explanation of closures with examples"},
-                    {"title": "You Don't Know JS - Closures", "url": "https://github.com/getify/You-Dont-Know-JS/tree/2nd-ed/scope-closures", "type": "Advanced Reference", "description": "Deep dive into JavaScript closures and scope"}
+                    {"title": "MDN - Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions"}
                 ]
             },
             {
-                'question': "What is the difference between '==' and '===' in JavaScript?",
+                'question': "How do you call a function named 'myFunc'?",
                 'options': [
-                    "'==' checks value and type, '===' checks value only",
-                    "'==' checks value only, '===' checks value and type",
-                    "'==' is used for assignment, '===' is used for comparison",
-                    "There is no difference, they are interchangeable"
+                    "myFunc();",
+                    "call myFunc;",
+                    "run myFunc()",
+                    "invoke myFunc"
                 ],
-                'correct': 1,
-                'explanation': "In JavaScript, '==' is the equality operator that checks for value equality with type coercion, while '===' is the strict equality operator that checks for both value and type equality without coercion.",
+                'correct': 0,
+                'explanation': "Functions are called by their name followed by parentheses.",
                 'references': [
-                    {"title": "MDN - Equality Operators", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Equality", "type": "Official Documentation", "description": "Detailed explanation of '==' and '===' operators in JavaScript"},
-                    {"title": "JavaScript.info - Equality", "url": "https://javascript.info/strict-equal", "type": "Tutorial", "description": "Learn about equality and inequality in JavaScript"},
-                    {"title": "W3Schools - JavaScript Comparison Operators", "url": "https://www.w3schools.com/js/js_comparisons.asp", "type": "Learning Resource", "description": "Examples and explanations of JavaScript comparison operators"}
+                    {"title": "MDN - Calling Functions", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions#calling_functions"}
                 ]
-            }
+            },
+            # Add more diverse questions here...
         ],
-        'hard': [
-            {
-                'question': "How does the 'this' keyword work in JavaScript functions?",
-                'options': [
-                    "It refers to the global object in all cases",
-                    "It refers to the object that is currently executing the function",
-                    "It is a keyword for defining constants in functions",
-                    "It has no special meaning, just a regular variable"
-                ],
-                'correct': 1,
-                'explanation': "The 'this' keyword in JavaScript functions refers to the object that is currently executing the function. Its value depends on how the function is called.",
-                'references': [
-                    {"title": "MDN - this", "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/this", "type": "Official Documentation", "description": "In-depth explanation of the 'this' keyword in JavaScript"},
-                    {"title": "JavaScript.info - Object Prototypes", "url": "https://javascript.info/propotypes", "type": "Tutorial", "description": "Understanding 'this' in the context of object prototypes"},
-                    {"title": "You Don't Know JS - this & Object Prototypes", "url": "https://github.com/getify/You-Dont-Know-JS/blob/2nd-ed/this%20&%20object%20prototypes.md", "type": "Advanced Reference", "description": "Detailed exploration of 'this' and object prototypes in JavaScript"}
-                ]
-            }
-        ]
+        # Add medium and hard questions similarly...
     },
-    'python_functions': {
-        'easy': [
-            {
-                'question': "What is the correct way to define a function called 'add_numbers' in Python?",
-                'options': [
-                    "def add_numbers():",
-                    "function add_numbers():",
-                    "define add_numbers():",
-                    "func add_numbers():"
-                ],
-                'correct': 0,
-                'explanation': "In Python, functions are defined using the 'def' keyword followed by the function name, parameters in parentheses, and a colon. This is Python's standard function definition syntax.",
-                'references': [
-                    {"title": "Python.org - Defining Functions", "url": "https://docs.python.org/3/tutorial/controlflow.html#defining-functions", "type": "Official Documentation", "description": "Official Python documentation on function definition"},
-                    {"title": "Real Python - Python Functions", "url": "https://realpython.com/defining-your-own-python-function/", "type": "Tutorial", "description": "Comprehensive tutorial on Python function creation and usage"},
-                    {"title": "Python Functions - GeeksforGeeks", "url": "https://www.geeksforgeeks.org/python-functions/", "type": "Learning Resource", "description": "Complete guide to Python functions with examples"}
-                ]
-            }
-        ],
-        'medium': [
-            {
-                'question': "What are Python decorators in relation to functions?",
-                'options': [
-                    "Functions that modify or enhance other functions without changing their code",
-                    "Functions that decorate the output with special formatting",
-                    "Functions that can only be used inside classes",
-                    "Functions that automatically generate documentation"
-                ],
-                'correct': 0,
-                'explanation': "Python decorators are a powerful feature that allows you to modify or enhance functions without permanently modifying their code. They use the @ symbol and are applied above function definitions.",
-                'references': [
-                    {"title": "Python.org - Decorators", "url": "https://docs.python.org/3/library/functools.html#functools.wraps", "type": "Official Documentation", "description": "Official documentation on Python decorators and functools"},
-                    {"title": "Real Python - Python Decorators", "url": "https://realpython.com/primer-on-python-decorators/", "type": "Tutorial", "description": "Complete primer on understanding and using Python decorators"},
-                    {"title": "Python Decorator Patterns", "url": "https://python-patterns.guide/python/decorators/", "type": "Advanced Reference", "description": "Design patterns and best practices for Python decorators"}
-                ]
-            }
-        ]
-    },
-    'algebra_equations': {
-        'easy': [
-            {
-                'question': "To solve the linear equation 2x + 5 = 13, what is the first step?",
-                'options': [
-                    "Subtract 5 from both sides",
-                    "Divide both sides by 2",
-                    "Add 5 to both sides",
-                    "Multiply both sides by 2"
-                ],
-                'correct': 0,
-                'explanation': "When solving linear equations, follow the order of operations in reverse. Since 5 is added to 2x, the first step is to subtract 5 from both sides to isolate the term with x.",
-                'references': [
-                    {"title": "Khan Academy - Linear Equations", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:linear-equations-in-one-variable", "type": "Educational", "description": "Interactive lessons on solving linear equations step by step"},
-                    {"title": "Purplemath - Solving Linear Equations", "url": "https://www.purplemath.com/modules/solvelin.htm", "type": "Tutorial", "description": "Detailed explanation of linear equation solving techniques"},
-                    {"title": "Math is Fun - Solving Equations", "url": "https://www.mathsisfun.com/algebra/linear-equations-solving.html", "type": "Learning Resource", "description": "Visual guide to solving algebraic equations"}
-                ]
-            }
-        ],
-        'medium': [
-            {
-                'question': "What is the solution to the quadratic equation x² - 5x + 6 = 0?",
-                'options': [
-                    "x = 2, x = 3",
-                    "x = 1, x = 6",
-                    "x = -2, x = -3",
-                    "x = 5, x = 1"
-                ],
-                'correct': 0,
-                'explanation': "Using factoring: x² - 5x + 6 = (x - 2)(x - 3) = 0. Therefore x = 2 or x = 3. You can verify: 2² - 5(2) + 6 = 4 - 10 + 6 = 0 ✓",
-                'references': [
-                    {"title": "Khan Academy - Quadratic Equations", "url": "https://www.khanacademy.org/math/algebra/x2f8bb11595b61c86:quadratic-functions-equations", "type": "Educational", "description": "Comprehensive course on quadratic equations and their solutions"},
-                    {"title": "Wolfram MathWorld - Quadratic Equation", "url": "https://mathworld.wolfram.com/QuadraticEquation.html", "type": "Mathematical Reference", "description": "Complete mathematical reference for quadratic equations"},
-                    {"title": "Paul's Online Math Notes - Quadratics", "url": "https://tutorial.math.lamar.edu/Classes/Alg/SolveQuadraticEqnsII.aspx", "type": "Advanced Tutorial", "description": "Detailed methods for solving quadratic equations"}
-                ]
-            }
-        ]
-    },
-    'chemistry_compounds': {
-        'easy': [
-            {
-                'question': "What type of chemical compound is table salt (NaCl)?",
-                'options': [
-                    "Ionic compound",
-                    "Covalent compound",
-                    "Metallic compound",
-                    "Organic compound"
-                ],
-                'correct': 0,
-                'explanation': "Table salt (NaCl) is an ionic compound formed by the electrostatic attraction between sodium cations (Na⁺) and chloride anions (Cl⁻). Sodium loses an electron to chlorine, forming ions.",
-                'references': [
-                    {"title": "NIST Chemistry WebBook - Sodium Chloride", "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=7647-14-5", "type": "Scientific Database", "description": "Official chemical data for sodium chloride"},
-                    {"title": "Khan Academy - Ionic Bonds", "url": "https://www.khanacademy.org/science/chemistry/chemical-bonds/types-chemical-bonds/a/ionic-bonds", "type": "Educational", "description": "Learn how ionic compounds like NaCl are formed"},
-                    {"title": "LibreTexts - Ionic Compounds", "url": "https://chem.libretexts.org/Courses/can/intro/04%3A_Ions_and_Ionic_Compounds", "type": "Academic Reference", "description": "Comprehensive guide to understanding ionic compounds"}
-                ]
-            }
-        ]
-    }
+    # Add other topics/subjects...
 }
 
 def generate_topic_focused_questions(quiz_data):
