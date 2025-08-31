@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -12,6 +14,17 @@ const Login = ({ onLogin }) => {
     confirmPassword: '',
     role: 'student'
   });
+
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (error || success) {
+      const timer = setTimeout(() => {
+        setError('');
+        setSuccess('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, success]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,10 +36,31 @@ const Login = ({ onLogin }) => {
     if (error) setError('');
   };
 
+  const handleRoleSelect = (role) => {
+    setFormData(prev => ({
+      ...prev,
+      role
+    }));
+  };
+
+  const toggleMode = () => {
+    setIsLoginMode(!isLoginMode);
+    setError('');
+    setSuccess('');
+    setFormData({
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      role: 'student'
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
 
     // Form validation
     if (!isLoginMode) {
@@ -37,6 +71,11 @@ const Login = ({ onLogin }) => {
       }
       if (formData.name.length < 2) {
         setError('Name must be at least 2 characters');
+        setLoading(false);
+        return;
+      }
+      if (formData.password.length < 6) {
+        setError('Password must be at least 6 characters');
         setLoading(false);
         return;
       }
@@ -94,6 +133,7 @@ const Login = ({ onLogin }) => {
     setLoading(false);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const switchMode = () => {
     setIsLoginMode(!isLoginMode);
     setError('');
@@ -110,20 +150,23 @@ const Login = ({ onLogin }) => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>🧠 Quizgenix</h1>
+          <div className="logo-icon">🧠</div>
+          <h1>Quizgenix</h1>
           <p>AI-Powered Quiz Generation Platform</p>
         </div>
 
         <div className="auth-tabs">
           <button 
             className={`tab ${isLoginMode ? 'active' : ''}`}
-            onClick={() => setIsLoginMode(true)}
+            onClick={toggleMode}
+            type="button"
           >
             Sign In
           </button>
           <button 
             className={`tab ${!isLoginMode ? 'active' : ''}`}
-            onClick={() => setIsLoginMode(false)}
+            onClick={toggleMode}
+            type="button"
           >
             Sign Up
           </button>
@@ -131,17 +174,24 @@ const Login = ({ onLogin }) => {
 
         {error && (
           <div className="error-message">
-            ❌ {error}
+            {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        {success && (
+          <div className="success-message">
+            {success}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className={`auth-form ${loading ? 'form-loading' : ''}`}>
           {!isLoginMode && (
             <div className="form-group">
+              <label className="form-label">Full Name</label>
               <input
                 type="text"
                 name="name"
-                placeholder="Full Name"
+                placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
@@ -152,10 +202,11 @@ const Login = ({ onLogin }) => {
           )}
 
           <div className="form-group">
+            <label className="form-label">Email Address</label>
             <input
               type="email"
               name="email"
-              placeholder="Email Address"
+              placeholder="Enter your email"
               value={formData.email}
               onChange={handleInputChange}
               required
@@ -164,25 +215,36 @@ const Login = ({ onLogin }) => {
           </div>
 
           <div className="form-group">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleInputChange}
-              required
-              className="form-input"
-              minLength="6"
-            />
+            <label className="form-label">Password</label>
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className="form-input"
+                minLength="6"
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
           </div>
 
           {!isLoginMode && (
             <>
               <div className="form-group">
+                <label className="form-label">Confirm Password</label>
                 <input
                   type="password"
                   name="confirmPassword"
-                  placeholder="Confirm Password"
+                  placeholder="Confirm your password"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
@@ -192,15 +254,23 @@ const Login = ({ onLogin }) => {
               </div>
 
               <div className="form-group">
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                  className="form-input"
-                >
-                  <option value="student">🎓 Student</option>
-                  <option value="lecturer">👨‍🏫 Lecturer</option>
-                </select>
+                <label className="form-label">Select Your Role</label>
+                <div className="role-selector">
+                  <div 
+                    className={`role-option ${formData.role === 'student' ? 'selected' : ''}`}
+                    onClick={() => handleRoleSelect('student')}
+                  >
+                    <span className="role-icon">🎓</span>
+                    <div>Student</div>
+                  </div>
+                  <div 
+                    className={`role-option ${formData.role === 'lecturer' ? 'selected' : ''}`}
+                    onClick={() => handleRoleSelect('lecturer')}
+                  >
+                    <span className="role-icon">👨‍🏫</span>
+                    <div>Lecturer</div>
+                  </div>
+                </div>
               </div>
             </>
           )}
@@ -208,15 +278,16 @@ const Login = ({ onLogin }) => {
           <button 
             type="submit" 
             className="auth-button"
-            disabled={loading}
           >
             {loading ? (
-              <>
+              <div className="loading-btn">
                 <span className="loading-spinner"></span>
                 {isLoginMode ? 'Signing In...' : 'Creating Account...'}
-              </>
+              </div>
             ) : (
-              isLoginMode ? 'Sign In' : 'Create Account'
+              <>
+                {isLoginMode ? '🚀 Sign In' : '✨ Create Account'}
+              </>
             )}
           </button>
         </form>
@@ -225,7 +296,7 @@ const Login = ({ onLogin }) => {
           <p>
             {isLoginMode ? "Don't have an account? " : "Already have an account? "}
             <button 
-              onClick={switchMode}
+              onClick={toggleMode}
               className="link-button"
               type="button"
             >
@@ -233,45 +304,55 @@ const Login = ({ onLogin }) => {
             </button>
           </p>
           
+          {isLoginMode && (
+            <div className="forgot-password">
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a href="#" onClick={(e) => e.preventDefault()}>
+                Forgot your password?
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Demo credentials helper */}
+        {process.env.NODE_ENV === 'development' && (
           <div style={{ 
             marginTop: '20px', 
             padding: '15px', 
-            background: '#f8f9fa', 
-            borderRadius: '8px', 
+            background: 'rgba(255, 255, 255, 0.1)', 
+            borderRadius: '12px', 
             fontSize: '12px',
-            border: '1px solid #e9ecef'
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            backdropFilter: 'blur(10px)'
           }}>
             <h4 style={{ 
               margin: '0 0 10px 0', 
-              color: '#667eea', 
+              color: 'rgba(255, 255, 255, 0.9)', 
               textAlign: 'center',
               fontSize: '13px',
               fontWeight: '600'
             }}>
-              🧪 Test Accounts:
+              🔧 Demo Credentials
             </h4>
-            <p style={{ 
-              margin: '5px 0', 
-              fontFamily: 'Courier New, monospace',
-              background: 'white',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              border: '1px solid #dee2e6'
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: '1fr 1fr', 
+              gap: '10px',
+              color: 'rgba(255, 255, 255, 0.8)'
             }}>
-              <strong>Lecturer:</strong> lecturer@test.com / password123
-            </p>
-            <p style={{ 
-              margin: '5px 0', 
-              fontFamily: 'Courier New, monospace',
-              background: 'white',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              border: '1px solid #dee2e6'
-            }}>
-              <strong>Student:</strong> student@test.com / password123
-            </p>
+              <div>
+                <strong>Student:</strong><br/>
+                Email: student@test.com<br/>
+                Password: password
+              </div>
+              <div>
+                <strong>Lecturer:</strong><br/>
+                Email: lecturer@test.com<br/>
+                Password: password
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
